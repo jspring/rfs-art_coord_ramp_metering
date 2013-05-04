@@ -1,0 +1,17 @@
+# Makefile
+#
+# Copyright (c) 2013   Regents of the University of California
+#
+include $(CAPATH_MK_DEFS)
+
+PATH_CFLAGS += -I$(ATSC_INC_DIR) -pg
+PATH_OBJS += $(OBJDIR)/signal_opt.o
+EXEC = $(OBJDIR)/ac_rm_algo
+
+all: 	$(OBJDIR) $(PATH_OBJS) $(EXEC)
+
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+clean:
+	\rm -f $(PATH_OBJS) $(EXEC)
