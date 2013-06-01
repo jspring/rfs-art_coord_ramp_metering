@@ -5,6 +5,9 @@
 #include <db_include.h>
 #include "msgs.h"
 #include "ac_rm_algo.h"
+#include "atsc.h"
+#include "atsc_clt_vars.h"
+#include <ab3418_lib.h>
 #include "ab3418comm.h"
 
 static jmp_buf exit_env;
@@ -36,11 +39,11 @@ static int sig_list[] =
         ERROR,
 };
 
-unsigned int db_trig_list[] =  {
+unsigned int db_trig_list_algo[] =  {
 	DB_TSCP_STATUS_VAR
 };
 
-int NUM_TRIG_VARS = sizeof(db_trig_list)/sizeof(int);
+int NUM_TRIG_VARS_ALGO = sizeof(db_trig_list_algo)/sizeof(int);
 
 
 int main( int argc, char *argv[]) {
@@ -67,7 +70,7 @@ int main( int argc, char *argv[]) {
 	get_local_name(hostname, MAXHOSTNAMELEN);
 	if ( ((pclt = db_list_init(argv[0], hostname,
 		domain, xport, NULL, 0, 
-		db_trig_list, NUM_TRIG_VARS)) == NULL))
+		db_trig_list_algo, NUM_TRIG_VARS_ALGO)) == NULL))
 		exit(EXIT_FAILURE);
 
 	if (setjmp(exit_env) != 0) {
@@ -87,7 +90,7 @@ int main( int argc, char *argv[]) {
 		retval = clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
                 if( DB_TRIG_VAR(&trig_info) == DB_TSCP_STATUS_VAR )
 //                        db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &get_long_status8_resp_mess);
-//		read_input();
+//		read_input(&get_long_status8_resp_mess);
 		get_opt_green();
 		save_g_opt();
 	}
