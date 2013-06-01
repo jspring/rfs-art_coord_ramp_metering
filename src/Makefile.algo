@@ -5,8 +5,8 @@
 include $(CAPATH_MK_DEFS)
 
 PATH_CFLAGS += -I$(ATSC_INC_DIR) -pg
-PATH_OBJS += $(OBJDIR)/signal_opt.o
-EXEC = $(OBJDIR)/ac_rm_algo
+PATH_OBJS += $(OBJDIR)/signal_opt.o $(OBJDIR)/ac_rm_table.o
+EXEC = $(OBJDIR)/ac_rm_algo $(OBJDIR)/wrfiles_ac_rm
 
 all: 	$(OBJDIR) $(PATH_OBJS) $(EXEC)
 
