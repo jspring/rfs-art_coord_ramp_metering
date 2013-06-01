@@ -1,9 +1,10 @@
 #include <db_include.h>
+#include <msgs.h>
 
 #define MAX_PHASE 8
 #define	SIGNAL_PHASE_NUM MAX_PHASE
 
-int read_input(void);
+int read_input(get_long_status8_resp_mess_typ *pget_long_status8_resp_mess);
 char file_input[128]="matlab_in.txt";
 char file_output[128]="matlab_out.txt";
 
@@ -19,19 +20,20 @@ float weight[MAX_PHASE];
 float RA;
 float Gmax[MAX_PHASE]={20.0,80.0,30.0,80.0,80.0,80.0,50.0,80.0};
 float vehicle_for_phase[MAX_PHASE];
-float demand_interval=5*60.0;
+float DEMAND_INTERVAL =5*60.0;
 float lost_time[MAX_PHASE]={5.0,5.0,5.0,5.0,5.0,5.0,5.0,5.0};
 float desired_green[MAX_PHASE];
 
 #include "linear_prog.h"
 #include "method2.h"
 
-int read_input()
+int read_input(get_long_status8_resp_mess_typ *pget_long_status8_resp_mess)
 {
 	int i;
 	FILE *fp=fopen(file_input,"r");
 	if(fp==NULL)
 		return 1;
+	
 	fscanf(fp,"%d",&SIGNAL_PHASE);
 	fscanf(fp,"%f",&cycle);
 	for(i=0;i<SIGNAL_PHASE;i++)
@@ -54,7 +56,7 @@ int get_vehicle_for_phase()
 {
 	int i;
 	for(i=0;i<SIGNAL_PHASE;i++)
-		vehicle_for_phase[i]=demand[i]*cycle/demand_interval+queue[i];
+		vehicle_for_phase[i] = ((demand[i] * cycle) / DEMAND_INTERVAL) + queue[i];
 	return 0;
 }
 int get_desired_green()
