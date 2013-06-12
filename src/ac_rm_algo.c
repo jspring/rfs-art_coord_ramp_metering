@@ -9,6 +9,7 @@
 #include "atsc_clt_vars.h"
 #include <ab3418_lib.h>
 #include "ab3418comm.h"
+#include "max_green_lib.h"
 
 static jmp_buf exit_env;
 
@@ -40,7 +41,8 @@ static int sig_list[] =
 };
 
 unsigned int db_trig_list_algo[] =  {
-	DB_TSCP_STATUS_VAR
+	DB_TSCP_STATUS_VAR,
+	DB_SHORT_STATUS_VAR
 };
 
 int NUM_TRIG_VARS_ALGO = sizeof(db_trig_list_algo)/sizeof(int);
@@ -55,17 +57,39 @@ int main( int argc, char *argv[]) {
 	posix_timer_typ *ptmr;
 	trig_info_typ trig_info;
         int ipc_message_error_ctr = 0;
-	int retval;
+	int retval = 0;
 	get_long_status8_resp_mess_typ get_long_status8_resp_mess;
+	get_short_status_resp_t short_status;
 	algo_input_t algo_input[NUM_PHASES];
+	int min_green = 0;
+	int max_green = 0;
+	unsigned char greenstat = 0;
+	unsigned char greenstat_sav = 0;
+	phase_timing_t phase_timing;
 
 	int i;
 	int opt;
 	int interval = 1000;
+	int loop_num = 0;
+	int verbose = 1;
 
-	for(i=0; i<NUM_PHASES; i++) {
-		demand[i] = 20;
-	}
+/***************************** Dongyan's code **********************************************************************/
+/*******************************************************************************************************************/
+	char filename[128]="measurement_data.txt";
+	int new_max_green = 15;
+	int old_max_green = 15;
+	double LT_queue=0.0;
+	double ramp_queue=0.0; 
+	double old_LT_queue=0.0; 
+	double old_ramp_queue=0.0;      //variables for the measurement
+
+	int flag,flag2;
+	FILE *fp = fopen(filename,"r");
+	if(fp==NULL)
+	return -1;
+
+/*******************************************************************************************************************/
+/*******************************************************************************************************************/
 
 	get_local_name(hostname, MAXHOSTNAMELEN);
 	if ( ((pclt = db_list_init(argv[0], hostname,
@@ -89,10 +113,55 @@ int main( int argc, char *argv[]) {
 	while(1) {	
 		retval = clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
                 if( DB_TRIG_VAR(&trig_info) == DB_TSCP_STATUS_VAR )
-//                        db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &get_long_status8_resp_mess);
-//		read_input(&get_long_status8_resp_mess);
-		get_opt_green();
-		save_g_opt();
+                        db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &get_long_status8_resp_mess);
+//		if(get_long_status8_resp_mess.presence3 & 0x20) {
+//			printf("ac_rm_algo: got trigger from detector 22!\n");
+//			max_green = 25;
+//		}
+//		else {
+//			printf("ac_rm_algo: No detector 22 trigger\n");
+//			max_green = 15;
+//		}
+
+//                if( DB_TRIG_VAR(&trig_info) == DB_SHORT_STATUS_VAR ) {
+                        db_clt_read(pclt, DB_SHORT_STATUS_VAR, sizeof(get_short_status_resp_t), &short_status);
+			greenstat = short_status.greens;
+			if( (greenstat_sav == 0x22) &&
+			    ((greenstat & greenstat_sav) == 0 )) {
+				printf("Phases 2 and 6 should be yellow now\n");
+				db_clt_read(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
+
+/****************************************************************************************************************************/
+/*************************************  Dongyan's code **********************************************************************/				
+/****************************************************************************************************************************/
+				//when need to get new measurement
+				flag = get_measurement(fp, &LT_queue, &ramp_queue);     //not finished
+				if(flag) {
+					fprintf(stderr, "get_measurement failed. Exiting....\n");	
+					fclose(fp);
+					return -1;
+				}
+				new_max_green = get_new_max_green_phase3(LT_queue, old_LT_queue, ramp_queue, old_ramp_queue, old_max_green);
+#define PHASE_3			3
+#define YELLOW_NO_CHANGE	0
+#define ALL_RED_NO_CHANGE	0
+#define MIN_GREEN_NO_CHANGE	0
+printf("%d: LT_queue %.1f old_LT_queue %.1f  ramp_queue %.1f  old_ramp_queue %.1f  old_max_green %.1f new_max_green %d\n", ++loop_num, LT_queue, old_LT_queue, ramp_queue, old_ramp_queue, old_max_green, new_max_green);	
+				flag2 = db_set_min_max_green(pclt, PHASE_3, MIN_GREEN_NO_CHANGE, new_max_green, YELLOW_NO_CHANGE, ALL_RED_NO_CHANGE, verbose);
+				if(flag2) {
+					fprintf(stderr, "db_set_min_max_green failed. Exiting....\n");	
+					fclose(fp);
+					return -1;
+				}
+				old_max_green = new_max_green;
+				old_LT_queue = LT_queue;
+				old_ramp_queue = ramp_queue;
+/****************************************************************************************************************************/
+/****************************************************************************************************************************/
+
+				}
+			greenstat_sav = greenstat;
+//		}
 	}
 	return 0;
 }

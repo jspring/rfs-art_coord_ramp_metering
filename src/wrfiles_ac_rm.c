@@ -26,6 +26,7 @@
 #include <path_gps_lib.h>
 #include <atsc.h>
 #include <atsc_clt_vars.h>
+#include <msgs.h>
 #include <ab3418_lib.h>
 #include <ab3418comm.h>
 #include "data_log.h"

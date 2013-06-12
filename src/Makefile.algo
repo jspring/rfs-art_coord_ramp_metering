@@ -3,10 +3,17 @@
 # Copyright (c) 2013   Regents of the University of California
 #
 include $(CAPATH_MK_DEFS)
+MAX_GREEN_LIB = $(OBJDIR)/libmax_green_lib.a
+MAX_GREEN_LIB_OBJS = $(OBJDIR)/max_green_lib.o
 
-PATH_CFLAGS += -I$(ATSC_INC_DIR) -pg
-PATH_OBJS += $(OBJDIR)/signal_opt.o $(OBJDIR)/ac_rm_table.o
-EXEC = $(OBJDIR)/ac_rm_algo $(OBJDIR)/wrfiles_ac_rm
+PATH_LDFLAGS += -L./lnx
+
+PATH_CFLAGS += -I$(ATSC_INC_DIR) -pg -Wall
+PATH_OBJS += $(OBJDIR)/signal_opt.o $(OBJDIR)/ac_rm_table.o $(OBJDIR)/max_green_lib.o
+PATH_LDFLAGS += -L$(ATSC_LIB_DIR)
+PATH_LIBS += -lset_min_max_green_lib
+
+EXEC = $(OBJDIR)/ac_rm_algo $(OBJDIR)/wrfiles_ac_rm $(OBJDIR)/max_green
 
 all: 	$(OBJDIR) $(PATH_OBJS) $(EXEC)
 
@@ -14,4 +21,4 @@ $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
 clean:
-	\rm -f $(PATH_OBJS) $(EXEC)
+	\rm -f $(OBJDIR)/*.[oa] $(EXEC)
