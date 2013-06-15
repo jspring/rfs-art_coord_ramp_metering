@@ -45,11 +45,10 @@ int get_new_max_green_phase3(double LT_queue, double old_LT_queue, double ramp_q
 	int new_max_green = old_max_green;
 	if(need_reduce_max_green(LT_queue, old_LT_queue, ramp_queue, old_ramp_queue))	//need to reduce time
 	{
-printf("get_new_max_green_phase3: reducing time; new_max_green_in %d ", new_max_green); 
+printf("get_new_max_green_phase3: reducing time; old max green %d ", new_max_green); 
 		new_max_green = old_max_green-MAX_GREEN_CHANGE;
-printf("new_max_green %d after old_max_green %d - MAX_GREEN_CHANGE %d ", new_max_green, old_max_green, MAX_GREEN_CHANGE); 
 		new_max_green = max(new_max_green,MAX_GREEN_LOWERBOUND);
-printf("new_max_green_out %d\n", new_max_green); 
+printf("new max green %d\n", new_max_green); 
 	}
 	else	//can increase time
 	{
