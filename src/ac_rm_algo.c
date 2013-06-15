@@ -66,12 +66,14 @@ int main( int argc, char *argv[]) {
 	unsigned char greenstat = 0;
 	unsigned char greenstat_sav = 0;
 	phase_timing_t phase_timing;
+	struct timespec start_time;
+	struct timespec end_time;
 
 	int i;
 	int opt;
 	int interval = 1000;
 	int loop_num = 0;
-	int verbose = 1;
+	int verbose = 0;
 
 /***************************** Dongyan's code **********************************************************************/
 /*******************************************************************************************************************/
@@ -109,27 +111,31 @@ int main( int argc, char *argv[]) {
 		fprintf(stderr, "Unable to initialize delay timer\n");
 		exit(EXIT_FAILURE);
 	}
-
+	
 	while(1) {	
 		retval = clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
                 if( DB_TRIG_VAR(&trig_info) == DB_TSCP_STATUS_VAR )
                         db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &get_long_status8_resp_mess);
-//		if(get_long_status8_resp_mess.presence3 & 0x20) {
-//			printf("ac_rm_algo: got trigger from detector 22!\n");
-//			max_green = 25;
-//		}
-//		else {
-//			printf("ac_rm_algo: No detector 22 trigger\n");
-//			max_green = 15;
-//		}
 
 //                if( DB_TRIG_VAR(&trig_info) == DB_SHORT_STATUS_VAR ) {
                         db_clt_read(pclt, DB_SHORT_STATUS_VAR, sizeof(get_short_status_resp_t), &short_status);
 			greenstat = short_status.greens;
+			if( (greenstat_sav == 0x0) &&
+			    ((greenstat  == 0x44 )) ) 
+                        	clock_gettime(CLOCK_REALTIME, &start_time);
+			if( (greenstat_sav == 0x44) &&
+			    ((greenstat  == 0x40 )) ) {
+				clock_gettime(CLOCK_REALTIME, &end_time);
+			        printf("%s: Green time for phase 3 %f sec\n\n", argv[0],
+                                (end_time.tv_sec + (end_time.tv_nsec/1.0e9)) -
+                                (start_time.tv_sec +(start_time.tv_nsec/1.0e9))
+                                );
+			}
 			if( (greenstat_sav == 0x22) &&
 			    ((greenstat & greenstat_sav) == 0 )) {
-				printf("Phases 2 and 6 should be yellow now\n");
-				db_clt_read(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
+				printf("\n\nPhases 2 and 6 should be yellow now\n");
+//				db_clt_read(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
+//				old_max_green = phase_timing.max_green1;
 
 /****************************************************************************************************************************/
 /*************************************  Dongyan's code **********************************************************************/				
@@ -146,7 +152,6 @@ int main( int argc, char *argv[]) {
 #define YELLOW_NO_CHANGE	0
 #define ALL_RED_NO_CHANGE	0
 #define MIN_GREEN_NO_CHANGE	0
-printf("%d: LT_queue %.1f old_LT_queue %.1f  ramp_queue %.1f  old_ramp_queue %.1f  old_max_green %.1f new_max_green %d\n", ++loop_num, LT_queue, old_LT_queue, ramp_queue, old_ramp_queue, old_max_green, new_max_green);	
 				flag2 = db_set_min_max_green(pclt, PHASE_3, MIN_GREEN_NO_CHANGE, new_max_green, YELLOW_NO_CHANGE, ALL_RED_NO_CHANGE, verbose);
 				if(flag2) {
 					fprintf(stderr, "db_set_min_max_green failed. Exiting....\n");	
@@ -156,6 +161,8 @@ printf("%d: LT_queue %.1f old_LT_queue %.1f  ramp_queue %.1f  old_ramp_queue %.1
 				old_max_green = new_max_green;
 				old_LT_queue = LT_queue;
 				old_ramp_queue = ramp_queue;
+//				phase_timing.max_green1 = new_max_green;
+//				db_clt_write(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
 /****************************************************************************************************************************/
 /****************************************************************************************************************************/
 
