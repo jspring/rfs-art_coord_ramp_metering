@@ -40,7 +40,7 @@ static int sig_list[] =
         ERROR,
 };
 
-unsigned int db_trig_list_algo[] =  {
+int db_trig_list_algo[] =  {
 	DB_TSCP_STATUS_VAR,
 	DB_SHORT_STATUS_VAR
 };
