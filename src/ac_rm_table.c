@@ -28,6 +28,7 @@ char *interval_str[] = {
  
 get_long_status8_resp_mess_typ status;
 get_short_status_resp_t short_status;
+phase_status_t	phase_status;
 timestamp_t timestamp;
 
 /**
@@ -36,7 +37,8 @@ timestamp_t timestamp;
 db_var_spec_t db_vars_ac_rm[] =
 {
         {DB_SHORT_STATUS_VAR, sizeof(get_short_status_resp_t), &short_status},
-        {DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &status}
+        {DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &status},
+        {DB_PHASE_STATUS_VAR, sizeof(phase_status_t), &phase_status}
 };
 int num_db_vars = (sizeof(db_vars_ac_rm)/sizeof(db_var_spec_t));
 
@@ -46,8 +48,8 @@ data_log_column_spec_t file_spec[] =
 {
         {"HH:MM:SS.SSS ", &timestamp, BASE_TIMESTAMP, REPLAY_TIME},		//###1
 //get_long_status8_resp_mess_typ
-        {"%hhu ",   &status.master_clock, BASE_CHAR, REPLAY_USE},		//###2
-        {"%hhu ",   &status.seq_number, BASE_CHAR, REPLAY_USE},			//###3
+        {"%03.3hhu ",   &status.master_clock, BASE_CHAR, REPLAY_USE},		//###2
+        {"%03.3hhu ",   &status.seq_number, BASE_CHAR, REPLAY_USE},		//###3
         {"%hhx ",   &status.status, BASE_CHAR, REPLAY_USE},			//###4
         {"%hhx ",   &status.pattern, BASE_CHAR, REPLAY_USE},			//###5
         {"%hhx ",   &status.active_phase, BASE_CHAR, REPLAY_USE},		//###6
@@ -59,12 +61,14 @@ data_log_column_spec_t file_spec[] =
         {"%hhx ",   &status.presence2, BASE_CHAR, REPLAY_USE},			//###12
         {"%hhx ",   &status.presence3, BASE_CHAR, REPLAY_USE},			//###13
         {"%hhx ",   &status.presence4, BASE_CHAR, REPLAY_USE},			//###14
-        {"%hhx ",   &short_status.greens, BASE_CHAR, REPLAY_USE}		//###15
-//        {"%hhu ",   &status.err, BASE_CHAR, REPLAY_USE},			//###16
-//        {"%hhu ",   &status.errindex, BASE_CHAR, REPLAY_USE},			//###17
+        {"%hhx ",   &phase_status.greens, BASE_CHAR, REPLAY_USE},		//###15
+        {"%hhx ",   &phase_status.yellows, BASE_CHAR, REPLAY_USE},		//###16
+        {"%hhx ",   &phase_status.reds, BASE_CHAR, REPLAY_USE}			//###17
+//        {"%hhu ",   &status.err, BASE_CHAR, REPLAY_USE},			//###18
+//        {"%hhu ",   &status.errindex, BASE_CHAR, REPLAY_USE},			//###19
 
         //Current acceleration received from n cars ahead
-//        {"%.2f ",   &m56_m430.host_rx_xg_491, BASE_FLOAT, REPLAY_USE},		//###7
+//        {"%.2f ",   &m56_m430.host_rx_xg_491, BASE_FLOAT, REPLAY_USE},	//###7
 //        {"%u ",   &m56_m431.message_timeout_counter, BASE_INT, REPLAY_USE},	//###8
 };
 
