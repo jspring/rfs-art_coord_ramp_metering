@@ -23,9 +23,8 @@ sleep 1
 
 echo "Starting ab3418comm"
 #/home/atsc/ab3418/lnx/ab3418comm -u 
-/home/atsc/ab3418/lnx/ab3418comm -u >>/big/data/ac_rm_1/ab3418comm.out &
+/home/atsc/ab3418/lnx/ab3418comm -i 100 -u -P /dev/ttyS0 >>/big/data/ac_rm_1/ab3418comm.out 2 >>/big/data/ac_rm_1/ab3418comm.err &
 sleep 1
 
 #echo "Starting wrfiles_ac_rm"
 /home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -d /big/data/ac_rm_1 -m 15 &
-

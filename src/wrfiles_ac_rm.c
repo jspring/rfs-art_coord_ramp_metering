@@ -196,8 +196,12 @@ int main(int argc, char *argv[])
 		}
 
 //        	utc_seconds_since_midnight = TS_TO_SEC(&my_gps.utc_time);
+#undef O_STDOUT
+#ifndef O_STDOUT
 		save_to_spec(f_ac_rm, timestamp, 0,
-//		save_to_spec(stdout, timestamp, 0,
+#else
+		save_to_spec(stdout, timestamp, 0,
+#endif
                                 pbuff_ac_rm, num_file_columns,
                                 &file_spec[0]);
 
