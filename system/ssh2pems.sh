@@ -22,7 +22,7 @@ done
 
 while [[ 1 ]]
 do
-	/usr/bin/autossh -M 7 -R 5557:localhost:22 jspring@128.32.234.154 >>/var/log/autossh.ssh.log 2>>/var/log/autossh.ssh.err
+	/usr/bin/autossh -M 7 -R 5557:localhost:22 -R 5559:localhost:80  jspring@128.32.234.154 >>/var/log/autossh.ssh.log 2>>/var/log/autossh.ssh.err
 	retval=$?
 	if [[ $retval != 0 ]]
 	then
