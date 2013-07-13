@@ -1,0 +1,23 @@
+#!/bin/bash
+# Script for checking the latest data file's timestamp against the last
+# timestamp written to the file, and the sequence number in the GetLongStatus8
+# message.  If either check fails, restart the database clients.
+
+filename=`/home/art_coord_ramp_metering/nagios/scripts/check_latest_ts_latest_file_too_old.sh`
+if [[ $? == 0 ]]
+then
+	check_bad_seq_no.sh $filename
+	if [[ $? == 0 ]]
+	then	
+		echo Good data
+		exit 0
+	else
+		echo Bad data
+		/home/art_coord_ramp_metering/system/artgo
+		exit 1
+	fi
+else
+	echo $filename too old
+	/home/art_coord_ramp_metering/system/artgo
+	exit 2
+fi
