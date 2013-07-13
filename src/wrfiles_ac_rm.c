@@ -204,6 +204,7 @@ int main(int argc, char *argv[])
 #endif
                                 pbuff_ac_rm, num_file_columns,
                                 &file_spec[0]);
+		fflush(NULL);
 
 		/** Check if time to close and reopen data logs */
                if (reopen_data_log_infix(&first_file, file_time, first_file_str,
