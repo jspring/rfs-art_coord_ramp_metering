@@ -6,18 +6,18 @@
 filename=`/home/art_coord_ramp_metering/nagios/scripts/check_latest_ts_latest_file_too_old.sh`
 if [[ $? == 0 ]]
 then
-	check_bad_seq_no.sh $filename
+	/home/art_coord_ramp_metering/nagios/scripts/check_bad_seq_no.sh $filename
 	if [[ $? == 0 ]]
 	then	
-		echo Good data
+		echo `date` Good data >>/big/data/ac_rm_1/ab3418comm.err
 		exit 0
 	else
-		echo Bad data
+		echo `date` Bad data. Restarting... >>/big/data/ac_rm_1/ab3418comm.err
 		/home/art_coord_ramp_metering/system/artgo
 		exit 1
 	fi
 else
-	echo $filename too old
+	echo `date` $filename too old. Restarting...>>/big/data/ac_rm_1/ab3418comm.err
 	/home/art_coord_ramp_metering/system/artgo
 	exit 2
 fi
