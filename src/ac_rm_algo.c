@@ -60,19 +60,13 @@ int main( int argc, char *argv[]) {
 	int retval = 0;
 	get_long_status8_resp_mess_typ get_long_status8_resp_mess;
 	get_short_status_resp_t short_status;
-	algo_input_t algo_input[NUM_PHASES];
-	int min_green = 0;
-	int max_green = 0;
 	unsigned char greenstat = 0;
 	unsigned char greenstat_sav = 0;
 	phase_timing_t phase_timing;
 	struct timespec start_time;
 	struct timespec end_time;
 
-	int i;
-	int opt;
 	int interval = 1000;
-	int loop_num = 0;
 	int verbose = 0;
 
 /****************************************************************************/
@@ -137,9 +131,9 @@ int main( int argc, char *argv[]) {
 //				db_clt_read(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
 //				old_max_green = phase_timing.max_green1;
 
-/****************************************************************************/
-/******* Dongyan's code *****************************************************/
-/****************************************************************************/
+/****************************************************************************************************************************/
+/*************************************  Dongyan's code begins****************************************************************/				
+/****************************************************************************************************************************/
 				//when need to get new measurement
 				flag = get_measurement(fp, &LT_queue, &ramp_queue);     //not finished
 				if(flag) {
@@ -161,11 +155,11 @@ int main( int argc, char *argv[]) {
 				old_max_green = new_max_green;
 				old_LT_queue = LT_queue;
 				old_ramp_queue = ramp_queue;
+/****************************************************************************************************************************/
+/*************************************  Dongyan's code ends******************************************************************/				
+/****************************************************************************************************************************/
 //				phase_timing.max_green1 = new_max_green;
 //				db_clt_write(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
-/****************************************************************************/
-/****************************************************************************/
-
 				}
 			greenstat_sav = greenstat;
 //		}
