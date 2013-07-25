@@ -3,8 +3,8 @@
 #define LAMBDA_IN 2
 #define LAMBDA_OUT 3
 #define ALPHA 1.0
-#define OCC_CRITICAL 20.0
-#define K_R 2.0
+#define OCC_CRITICAL 25.0
+#define K_R 70.0
 #define ALINEA_LOWER_BOUND 1200.0
 #define ALINEA_UPPER_BOUND 1700.0
 
