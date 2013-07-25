@@ -6,11 +6,12 @@
 #include "msgs.h"
 #include "ac_rm_algo.h"
 #include "atsc.h"
+#include "urms.h"
 #include "atsc_clt_vars.h"
 #include <ab3418_lib.h>
 #include "ab3418comm.h"
 #include "max_green_lib.h"
-
+#include "meter_lib.h"
 static jmp_buf exit_env;
 
 #define NUM_PHASES	8
@@ -56,6 +57,7 @@ int main( int argc, char *argv[]) {
 	int xport = COMM_OS_XPORT;
 	posix_timer_typ *ptmr;
 	trig_info_typ trig_info;
+	db_urms_t db_urms;
         int ipc_message_error_ctr = 0;
 	int retval = 0;
 	get_long_status8_resp_mess_typ get_long_status8_resp_mess;
@@ -68,24 +70,33 @@ int main( int argc, char *argv[]) {
 
 	int interval = 1000;
 	int verbose = 0;
-
-/****************************************************************************/
 /******* Dongyan's code *****************************************************/
 /****************************************************************************/
 	char filename[128]="measurement_data.txt";
+	char meter_datafile[128]="meter_data.txt";
+	//variables for the intersection measurement
 	int new_max_green = 15;
 	int old_max_green = 15;
 	double LT_queue=0.0;
 	double ramp_queue=0.0; 
 	double old_LT_queue=0.0; 
-	double old_ramp_queue=0.0;      //variables for the measurement
+	double old_ramp_queue=0.0; 
+	double RT_queue=0.0;	
+	//variables for the onramp data
+	double freeway_occ, freeway_flow, ramp_flow;
+	double new_meter_rate, old_meter_rate;
 
 	int flag,flag2;
 	FILE *fp = fopen(filename,"r");
 	if(fp==NULL)
 	return -1;
-/****************************************************************************/
-/****************************************************************************/
+
+	int flag_m, flag_m2;
+	FILE *fp_m = fopen(meter_datafile,"r");
+	if(fp_m==NULL)
+		return -1;	
+/*******************************************************************************************************************/
+/*******************************************************************************************************************/
 
 	get_local_name(hostname, MAXHOSTNAMELEN);
 	if ( ((pclt = db_list_init(argv[0], hostname,
@@ -111,7 +122,7 @@ int main( int argc, char *argv[]) {
                 if( DB_TRIG_VAR(&trig_info) == DB_TSCP_STATUS_VAR )
                         db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &get_long_status8_resp_mess);
 
-//                if( DB_TRIG_VAR(&trig_info) == DB_SHORT_STATUS_VAR ) {
+                if( DB_TRIG_VAR(&trig_info) == DB_SHORT_STATUS_VAR ) {
                         db_clt_read(pclt, DB_SHORT_STATUS_VAR, sizeof(get_short_status_resp_t), &short_status);
 			greenstat = short_status.greens;
 			if( (greenstat_sav == 0x0) &&
@@ -131,17 +142,48 @@ int main( int argc, char *argv[]) {
 //				db_clt_read(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
 //				old_max_green = phase_timing.max_green1;
 
-/****************************************************************************************************************************/
-/*************************************  Dongyan's code begins****************************************************************/				
-/****************************************************************************************************************************/
+/****************************************************************************/
+/******  Dongyan's code begins***********************************************/				
+/****************************************************************************/
 				//when need to get new measurement
-				flag = get_measurement(fp, &LT_queue, &ramp_queue);     //not finished
+				flag_m = get_meter_measurement(fp_m, &freeway_occ, &freeway_flow, &ramp_flow); //get freeway and onramp data, this function should be at the onramp laptop
+				if(flag_m)
+				{
+					fclose(fp_m);
+					return -1;
+				}
+
+				send_freeway_data();	//send freeway data to master computer to compute new meter rate and intersection max green
+
+
+
+
+				//the functions below should be at the master computer
+				old_meter_rate = ramp_flow;
+				new_meter_rate = get_meter_rate(freeway_occ, ramp_flow, freeway_flow);
+				db_clt_read(pclt, DB_URMS_VAR, sizeof(db_urms_t), &db_urms);
+				db_urms.lane_1_release_rate = new_meter_rate;
+				db_urms.lane_2_release_rate = new_meter_rate;
+				db_urms.lane_1_action = URMS_ACTION_FIXED_RATE;
+				db_urms.lane_2_action = URMS_ACTION_FIXED_RATE;
+				db_urms.lane_1_plan = 1;
+				db_urms.lane_2_plan = 2;
+				db_clt_write(pclt, DB_URMS_VAR, sizeof(db_urms_t), &db_urms);
+printf("ac_rm_algo: new meter rate %f\n", new_meter_rate);
+				flag_m2 = send_meter_rate(new_meter_rate);	//send meter rate to onramp laptop, then the onramp laptop should set the new meter rate to controller
+				if(flag_m2)
+				{
+					fclose(fp_m);
+					return -1;
+				}
+
+				flag = get_measurement(fp, &LT_queue, &ramp_queue, &RT_queue);
 				if(flag) {
 					fprintf(stderr, "get_measurement failed. Exiting....\n");	
 					fclose(fp);
 					return -1;
 				}
-				new_max_green = get_new_max_green_phase3(LT_queue, old_LT_queue, ramp_queue, old_ramp_queue, old_max_green);
+				new_max_green = get_new_max_green_phase3(LT_queue, old_LT_queue, ramp_queue, old_ramp_queue, old_max_green, RT_queue, new_meter_rate, old_meter_rate);
 #define PHASE_3			3
 #define YELLOW_NO_CHANGE	0
 #define ALL_RED_NO_CHANGE	0
@@ -155,14 +197,17 @@ int main( int argc, char *argv[]) {
 				old_max_green = new_max_green;
 				old_LT_queue = LT_queue;
 				old_ramp_queue = ramp_queue;
-/****************************************************************************************************************************/
-/*************************************  Dongyan's code ends******************************************************************/				
-/****************************************************************************************************************************/
-//				phase_timing.max_green1 = new_max_green;
-//				db_clt_write(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
+/****************************************************************************/
+/******  Dongyan's code ends***********************************************/				
+/****************************************************************************/
+				phase_timing.max_green1 = new_max_green;
+				db_clt_write(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
+
 				}
 			greenstat_sav = greenstat;
-//		}
+		}
 	}
+	fclose(fp);
+	fclose(fp_m);
 	return 0;
 }
