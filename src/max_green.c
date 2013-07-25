@@ -8,7 +8,7 @@ char filename[128]="measurement_data.txt";
 int main()
 {
 	int new_max_green, old_max_green;
-	double LT_queue=0.0, ramp_queue=0.0, old_LT_queue=0.0, old_ramp_queue=0.0;	//variables for the measurement
+	double LT_queue=0.0, RT_queue=0, ramp_queue=0.0, old_LT_queue=0.0, old_ramp_queue=0.0, new_meter_rate=0, old_meter_rate=0;	//variables for the measurement
 
 	int flag,flag2;
 	FILE *fp = fopen(filename,"r");
@@ -21,7 +21,7 @@ int main()
 	while(true)
 	{
 		//when need to get new measurement
-		flag = get_measurement(fp, &LT_queue, &ramp_queue);	//not finished
+		flag = get_measurement(fp, &LT_queue, &ramp_queue, &RT_queue);	//not finished
 
 		if(flag)
 		{
@@ -29,7 +29,7 @@ int main()
 			return -1;
 		}
 
-		new_max_green = get_new_max_green_phase3(LT_queue, old_LT_queue, ramp_queue, old_ramp_queue, old_max_green);
+		new_max_green = get_new_max_green_phase3(LT_queue, old_LT_queue, ramp_queue, old_ramp_queue, old_max_green, RT_queue, new_meter_rate, old_meter_rate);
 		
 		flag2 = set_new_max_green_phase3(new_max_green);	//not finished
 		if(flag2)
