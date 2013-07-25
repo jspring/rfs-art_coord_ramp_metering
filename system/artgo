@@ -4,6 +4,14 @@ echo "Killing wrfiles_ac_rm"
 killall wrfiles_ac_rm
 sleep 1
 
+echo "Killing ac_rm_algo"
+killall ac_rm_algo
+sleep 1
+
+echo "Killing urms"
+killall urms
+sleep 1
+
 echo "Killing ab3418comm"
 killall ab3418comm
 sleep 1
@@ -22,8 +30,17 @@ echo "Starting db_slv"
 sleep 1
 
 echo "Starting ab3418comm"
-#/home/atsc/ab3418/lnx/ab3418comm -u 
+#/home/atsc/ab3418/lnx/ab3418comm -u & 
 /home/atsc/ab3418/lnx/ab3418comm -i 100 -u -P /dev/ttyS0 >>/big/data/ac_rm_1/ab3418comm.out 2 >>/big/data/ac_rm_1/ab3418comm.err &
+sleep 1
+
+echo "Starting urms"
+/home/atsc/urms/lnx/urms & 
+sleep 1
+
+echo "Starting ac_rm_algo"
+cd /home/art_coord_ramp_metering/src 
+./lnx/ac_rm_algo & 
 sleep 1
 
 #echo "Starting wrfiles_ac_rm"
