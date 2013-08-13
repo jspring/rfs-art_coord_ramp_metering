@@ -12,6 +12,11 @@ echo "Killing urms"
 killall urms
 sleep 1
 
+echo "Killing receive_urms_data"
+killall receive_urms_data
+#killall netcat.10.0.1.202-to-stdout.sh
+sleep 1
+
 echo "Killing ab3418comm"
 killall ab3418comm
 sleep 1
@@ -31,17 +36,19 @@ sleep 1
 
 echo "Starting ab3418comm"
 #/home/atsc/ab3418/lnx/ab3418comm -u & 
-/home/atsc/ab3418/lnx/ab3418comm -i 100 -u -P /dev/ttyS0 >>/big/data/ac_rm_1/ab3418comm.out 2 >>/big/data/ac_rm_1/ab3418comm.err &
-sleep 1
+#/home/atsc/ab3418/lnx/ab3418comm -i 1000 -u -P /dev/ttyS0 >>/big/data/ac_rm_1/ab3418comm.out 2 >>/big/data/ac_rm_1/ab3418comm.err &
+/home/atsc/ab3418/lnx/ab3418comm -i 1000 -u -P /dev/ttyUSB0 >>/big/data/ac_rm_1/ab3418comm.out 2 >>/big/data/ac_rm_1/ab3418comm.err &
+sleep 5
 
-echo "Starting urms"
-/home/atsc/urms/lnx/urms & 
+echo "Starting receive_urms_data"
+#/home/art_coord_ramp_metering/system/netcat.10.0.1.202-to-stdout.sh | /home/atsc/ab3418/lnx/receive_urms_data &
+/home/atsc/ab3418/lnx/receive_urms_data &
 sleep 1
 
 echo "Starting ac_rm_algo"
 cd /home/art_coord_ramp_metering/src 
-./lnx/ac_rm_algo & 
+./lnx/ac_rm_algo 
 sleep 1
 
 #echo "Starting wrfiles_ac_rm"
-/home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -d /big/data/ac_rm_1 -m 15 &
+#/home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -d /big/data/ac_rm_1 -m 15 &
