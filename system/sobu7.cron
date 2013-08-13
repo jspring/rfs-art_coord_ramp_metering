@@ -1,0 +1,1 @@
+* * * * * ps -elf |grep -v grep | grep 'netcat.sobu7-to-sobu46.sh'; if [[ $? -ne 0 ]] ; then /root/netcat.sobu7-to-sobu46.sh; fi
