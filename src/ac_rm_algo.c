@@ -41,9 +41,10 @@ static int sig_list[] =
         ERROR,
 };
 
-int db_trig_list_algo[] =  {
+unsigned int db_trig_list_algo[] =  {
 	DB_TSCP_STATUS_VAR,
 	DB_SHORT_STATUS_VAR
+	DB_URMS_STATUS_VAR
 };
 
 int NUM_TRIG_VARS_ALGO = sizeof(db_trig_list_algo)/sizeof(int);
@@ -57,11 +58,14 @@ int main( int argc, char *argv[]) {
 	int xport = COMM_OS_XPORT;
 	posix_timer_typ *ptmr;
 	trig_info_typ trig_info;
+
 	db_urms_t db_urms;
-        int ipc_message_error_ctr = 0;
-	int retval = 0;
 	get_long_status8_resp_mess_typ get_long_status8_resp_mess;
 	get_short_status_resp_t short_status;
+	db_urms_status_t db_urms_status;
+
+        int ipc_message_error_ctr = 0;
+	int retval = 0;
 	unsigned char greenstat = 0;
 	unsigned char greenstat_sav = 0;
 	phase_timing_t phase_timing;
@@ -103,7 +107,7 @@ int main( int argc, char *argv[]) {
 		domain, xport, NULL, 0, 
 		db_trig_list_algo, NUM_TRIG_VARS_ALGO)) == NULL))
 		exit(EXIT_FAILURE);
-
+printf("ac_rm_algo: Got to 1\n");
 	if (setjmp(exit_env) != 0) {
 		db_list_done(pclt, NULL, 0, NULL, 0);
 		printf("%s: %d IPC message errors\n", argv[0], 
@@ -121,6 +125,11 @@ int main( int argc, char *argv[]) {
 		retval = clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
                 if( DB_TRIG_VAR(&trig_info) == DB_TSCP_STATUS_VAR )
                         db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &get_long_status8_resp_mess);
+
+                if( DB_TRIG_VAR(&trig_info) == DB_URMS_STATUS_VAR ) {
+                        db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+			printf("db_urms_status lane 1 rate %d\n", (db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char)db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb);
+		}
 
                 if( DB_TRIG_VAR(&trig_info) == DB_SHORT_STATUS_VAR ) {
                         db_clt_read(pclt, DB_SHORT_STATUS_VAR, sizeof(get_short_status_resp_t), &short_status);
