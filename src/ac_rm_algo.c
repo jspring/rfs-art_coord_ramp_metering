@@ -43,7 +43,7 @@ static int sig_list[] =
 
 unsigned int db_trig_list_algo[] =  {
 	DB_TSCP_STATUS_VAR,
-	DB_SHORT_STATUS_VAR
+	DB_SHORT_STATUS_VAR,
 	DB_URMS_STATUS_VAR
 };
 
@@ -123,15 +123,22 @@ printf("ac_rm_algo: Got to 1\n");
 	
 	while(1) {	
 		retval = clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
-                if( DB_TRIG_VAR(&trig_info) == DB_TSCP_STATUS_VAR )
+                if( DB_TRIG_VAR(&trig_info) == DB_TSCP_STATUS_VAR ) {
                         db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &get_long_status8_resp_mess);
+			if(verbose)
+				printf("Got DB_TSCP_STATUS_VAR\n");
+		}
 
                 if( DB_TRIG_VAR(&trig_info) == DB_URMS_STATUS_VAR ) {
                         db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
-			printf("db_urms_status lane 1 rate %d\n", (db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char)db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb);
+			if(verbose)
+				printf("Got DB_URMS_STATUS_VAR\n");
+//			printf("db_urms_status lane 1 rate %d\n", (db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char)db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb);
 		}
 
                 if( DB_TRIG_VAR(&trig_info) == DB_SHORT_STATUS_VAR ) {
+			if(verbose)
+				printf("Got DB_SHORT_STATUS_VAR\n");
                         db_clt_read(pclt, DB_SHORT_STATUS_VAR, sizeof(get_short_status_resp_t), &short_status);
 			greenstat = short_status.greens;
 			if( (greenstat_sav == 0x0) &&

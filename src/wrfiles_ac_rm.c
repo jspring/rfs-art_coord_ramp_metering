@@ -22,7 +22,6 @@
  *
  */
 #include <db_include.h>
-#include <db_utils.h>
 #include <path_gps_lib.h>
 #include <atsc.h>
 #include <atsc_clt_vars.h>
@@ -30,6 +29,7 @@
 #include <ab3418_lib.h>
 #include <ab3418comm.h>
 #include "data_log.h"
+#include "clt_vars.h"
 
 static int sig_list[] = 
 {
@@ -67,7 +67,7 @@ extern data_log_column_spec_t file_spec[];
 extern int num_file_columns;
 
 extern db_var_spec_t db_vars_ac_rm[];
-extern int num_db_vars;
+extern int num_ac_rm_vars;
 
 path_gps_point_t cabinet_gps; 		// GPS in cabinet
 
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
                 /* Read in all DB vars, whether or not the associated files
                  * are being written
                  */
-                for (i = 0; i < num_db_vars; i++){
+                for (i = 0; i < num_ac_rm_vars; i++){
                         db_clt_read(pclt,
                                 db_vars_ac_rm[i].db_id_num,
                                 db_vars_ac_rm[i].size,

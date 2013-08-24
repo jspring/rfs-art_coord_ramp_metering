@@ -6,10 +6,6 @@ pid=`ps -elf | grep -v grep | grep '/bin/bash /home/art_coord_ramp_metering/syst
 kill $pid
 sleep 1
 
-echo "Stopping netcat"
-pid=`ps -elf | grep -v grep | grep '/bin/bash /home/art_coord_ramp_metering/system/netcat.rmhost-to-sobu7.sh' | awk '{print $4}'`
-kill $pid
-
 echo "Stopping urms"
 killall urms
 sleep 1
