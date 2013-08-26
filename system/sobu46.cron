@@ -1,14 +1,8 @@
 #!/bin/sh
 
-ps -elf |grep -v grep | grep 'netcat.sobu46-listening-to-sobu7-on-port-4455.sh'
+ps -elf |grep -v grep | grep 'forwarding-local'
 
 if [[ $? -ne 0 ]]
 then
-	/root/netcat.sobu46-listening-to-sobu7-on-port-4455.sh &
-fi
-
-ps -elf |grep -v grep | grep 'netcat.sobu46-listening-to-10.0.1.202-on-port-4444.sh'
-if [[ $? -ne 0 ]]
-then
-	/root/netcat.sobu46-listening-to-10.0.1.202-on-port-4444.sh &
+	/root/netcat.sobu46-forwarding-local-port-4455-to-port-4444.sh &
 fi
