@@ -47,8 +47,8 @@ echo "Starting ab3418comm"
 #/home/atsc/ab3418/lnx/ab3418comm -i 1000 -u -p /dev/ttyUSB0 >>/big/data/ac_rm_1/ab3418comm.out 2>>/big/data/ac_rm_1/ab3418comm.err &
 sleep 5
 
-echo "Starting receive_urms_data"
-/home/atsc/ab3418/lnx/receive_urms_data -v  &
+echo "Starting receive_urms_data_go.sh"
+/home/art_coord_ramp_metering/system/receive_urms_data_go.sh &
 sleep 1
 
 #echo "Starting ac_rm_algo"
