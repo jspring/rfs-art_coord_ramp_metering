@@ -14,7 +14,10 @@ sleep 1
 
 echo "Killing receive_urms_data"
 killall receive_urms_data
-#killall netcat.10.0.1.202-to-stdout.sh
+sleep 1
+
+echo "Killing receive_urms_data_go.sh"
+killall receive_urms_data_go.sh
 sleep 1
 
 echo "Killing clt_vars"
