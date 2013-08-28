@@ -86,7 +86,6 @@ int main(int argc, char *argv[])
 
 	int file_time = 15;     /// Number of minutes to record to a file 
 	int interval = 50;	/// Number of milliseconds between saves 
-	int lines_to_save = 100000;	/// when using memory; about 2 hours
 	posix_timer_typ *ptimer;       /* Timing proxy */
 	char *domain = DEFAULT_SERVICE; // usually no need to change this 
 	int xport = COMM_OS_XPORT;	// set correct for OS in sys_os.h 
@@ -96,6 +95,7 @@ int main(int argc, char *argv[])
 	char tripstr[80];
 	char ac_rm_pre[80];
 	int i;
+	int use_stdout = 0;
 
 	memset(id_string, 0, sizeof(id_string));
 	memset(monthday, 0, sizeof(monthday));
@@ -105,35 +105,38 @@ int main(int argc, char *argv[])
 	memset(ac_rm_pre, 0, sizeof(ac_rm_pre));
 
 	/* Read and interpret any user switches. */
-	while ((option = getopt(argc, argv, "d:l:m:ABCDEFGt:uic:rv")) != EOF) {
+	while ((option = getopt(argc, argv, "d:m:io")) != EOF) {
 		switch(option) {
 		case 'd':
 			strcpy(tripdir, optarg);
-			break;
-	        case 'l':
-			lines_to_save = atoi(optarg);
 			break;
 	        case 'm':
 			file_time = atoi(optarg);
 			if(file_time == 0)
 			    file_time = 10000;
 			break;
-	        case 't':
+	        case 'i':
 			interval = atoi(optarg); 
+			break;
+	        case 'o':
+			use_stdout = 1; 
 			break;
 	        default:
 			printf("Usage: %s\n", argv[0]); 
 			printf("    -d <trip directory> \n");
-			printf("    -m <file time in minutes> \n");
-			printf("    -l <no. lines to save to file> \n");
-			printf("    -t <loop time in ms> \n");
+			printf("    -m <file time in minutes (def. 15 min)> \n");
+			printf("    -i <loop time in ms (def. 50 ms)> \n");
+			printf("    -o (use stdout instead of named file as data output)\n");
 			exit(EXIT_FAILURE);
 	        }
 	}
-	strcpy(tripstr, tripdir+17);
-	printf("tripdir %s\n", tripdir);
-	printf("tripstr as string %s as decimal %d\n", tripstr, atoi(tripstr));
-	printf(" file columns %d\n", num_file_columns);
+
+	if(use_stdout == 0) {
+		strcpy(tripstr, tripdir+17);
+		printf("tripdir %s\n", tripdir);
+		printf("tripstr as string %s as decimal %d\n", tripstr, atoi(tripstr));
+		printf(" file columns %d\n", num_file_columns);
+	}
 
 	/* Log in to the database (shared global memory).  Default to the
 	 * the current host. Assumes other processes that create variables
@@ -155,6 +158,7 @@ int main(int argc, char *argv[])
 	 * that will be used to handle timestamp and name set-up handling on
 	 * reopens
 	 */
+	if(use_stdout == 0) {
 		strcpy(ac_rm_pre, tripdir);
 		strcat(ac_rm_pre, "/");
 		strcat(ac_rm_pre, "a");
@@ -169,6 +173,7 @@ int main(int argc, char *argv[])
                         open_another_file(&f_ac_rm, ac_rm_pre,
                                   id_string, ".dat");
                 }
+	}
 
 	if(( exitsig = setjmp(exit_env)) != 0) {
 		if (f_ac_rm)
@@ -195,19 +200,21 @@ int main(int argc, char *argv[])
                                 db_vars_ac_rm[i].var_pointer);
 		}
 
-//        	utc_seconds_since_midnight = TS_TO_SEC(&my_gps.utc_time);
-#undef O_STDOUT
-#ifndef O_STDOUT
-		save_to_spec(f_ac_rm, timestamp, 0,
-#else
-		save_to_spec(stdout, timestamp, 0,
-#endif
+		if(use_stdout) {
+			save_to_spec(stdout, timestamp, 0,
                                 pbuff_ac_rm, num_file_columns,
                                 &file_spec[0]);
+		}
+		else {
+			save_to_spec(f_ac_rm, timestamp, 0,
+                                pbuff_ac_rm, num_file_columns,
+                                &file_spec[0]);
+		}
 		fflush(NULL);
 
 		/** Check if time to close and reopen data logs */
-               if (reopen_data_log_infix(&first_file, file_time, first_file_str,
+		if(use_stdout == 0) {
+               		if (reopen_data_log_infix(&first_file, file_time, first_file_str,
                                 ".dat", &start_time, &old_fileday, &serial_num,
                                 monthday, serialnum, tripstr, pfirst_buff))  {
                         // done for first file in reopen_data_log
@@ -215,8 +222,8 @@ int main(int argc, char *argv[])
 			sprintf(id_string, "%s%s%s", monthday, tripstr, serialnum);
 			reopen_another_file(&f_ac_rm, ac_rm_pre,
                                         id_string, ".dat", pbuff_ac_rm);
+			}
 		}
-		else
 		TIMER_WAIT(ptimer);
 	}
 }
