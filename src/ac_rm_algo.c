@@ -129,6 +129,7 @@ printf("ac_rm_algo: Got to 1\n");
 				printf("Got DB_TSCP_STATUS_VAR\n");
 		}
 
+		//Read in ramp & mainline data
                 if( DB_TRIG_VAR(&trig_info) == DB_URMS_STATUS_VAR ) {
                         db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
 			if(verbose)
@@ -161,23 +162,10 @@ printf("ac_rm_algo: Got to 1\n");
 /****************************************************************************/
 /******  Dongyan's code begins***********************************************/				
 /****************************************************************************/
-				//when need to get new measurement
-				flag_m = get_meter_measurement(fp_m, &freeway_occ, &freeway_flow, &ramp_flow); //get freeway and onramp data, this function should be at the onramp laptop
-				if(flag_m)
-				{
-					fclose(fp_m);
-					return -1;
-				}
-
-				send_freeway_data();	//send freeway data to master computer to compute new meter rate and intersection max green
-
-
-
 
 				//the functions below should be at the master computer
 				old_meter_rate = ramp_flow;
 				new_meter_rate = get_meter_rate(freeway_occ, ramp_flow, freeway_flow);
-				db_clt_read(pclt, DB_URMS_VAR, sizeof(db_urms_t), &db_urms);
 				db_urms.lane_1_release_rate = new_meter_rate;
 				db_urms.lane_2_release_rate = new_meter_rate;
 				db_urms.lane_1_action = URMS_ACTION_FIXED_RATE;
