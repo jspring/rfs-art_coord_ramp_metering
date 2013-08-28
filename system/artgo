@@ -16,6 +16,10 @@ echo "Killing receive_urms_data"
 killall receive_urms_data
 sleep 1
 
+echo "Killing receive_urms_data_go.sh"
+killall receive_urms_data_go.sh
+sleep 1
+
 echo "Killing ab3418comm"
 killall ab3418comm
 sleep 1
@@ -57,4 +61,5 @@ sleep 1
 #sleep 1
 
 #echo "Starting wrfiles_ac_rm"
-/home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -d /big/data/ac_rm_1 -m 15 
+/home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -d /big/data/ac_rm_1 -m 15 &
+#/home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -o
