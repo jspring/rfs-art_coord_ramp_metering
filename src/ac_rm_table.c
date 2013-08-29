@@ -114,6 +114,8 @@ data_log_column_spec_t file_spec[] =
         {"%hu ",   &urms_datafile.metering_rate[2], BASE_SHORT, REPLAY_USE},	//###54
         {"%hhu ",   &db_urms_status.cmd_src[2], BASE_CHAR, REPLAY_USE},		//###55
         {"%hhu ",   &db_urms_status.action[2], BASE_CHAR, REPLAY_USE},		//###56
+        {"%hhu ",   &db_urms_status.rm2rmc_ctr, BASE_CHAR, REPLAY_USE},		//###57
+        {"%hhu ",   &db_urms_status.rmc2ac_ctr, BASE_CHAR, REPLAY_USE},		//###58
 
 
 //        {"%hhu ",   &status.err, BASE_CHAR, REPLAY_USE},			//###48
