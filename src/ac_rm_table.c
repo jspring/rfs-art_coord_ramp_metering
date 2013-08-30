@@ -116,6 +116,7 @@ data_log_column_spec_t file_spec[] =
         {"%hhu ",   &db_urms_status.action[2], BASE_CHAR, REPLAY_USE},		//###56
         {"%hhu ",   &db_urms_status.rm2rmc_ctr, BASE_CHAR, REPLAY_USE},		//###57
         {"%hhu ",   &db_urms_status.rmc2ac_ctr, BASE_CHAR, REPLAY_USE},		//###58
+        {"%hhu ",   &db_urms_status.is_metering, BASE_CHAR, REPLAY_USE},		//###59
 
 
 //        {"%hhu ",   &status.err, BASE_CHAR, REPLAY_USE},			//###48
