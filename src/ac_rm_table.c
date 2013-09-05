@@ -98,25 +98,29 @@ data_log_column_spec_t file_spec[] =
         {"%hu ",   &urms_datafile.metering_rate[0], BASE_SHORT, REPLAY_USE},	//###40
         {"%hhu ",   &db_urms_status.cmd_src[0], BASE_CHAR, REPLAY_USE},		//###41
         {"%hhu ",   &db_urms_status.action[0], BASE_CHAR, REPLAY_USE},		//###42
+        {"%hhu ",   &db_urms_status.plan[0], BASE_CHAR, REPLAY_USE},		//###43
 
-        {"%hhu ",   &db_urms_status.metered_lane_stat[1].demand_vol, BASE_CHAR, REPLAY_USE},	//###43
-        {"%hhu ",   &db_urms_status.metered_lane_stat[1].passage_vol, BASE_CHAR, REPLAY_USE},	//###44
-        {"%.1f ",   &urms_datafile.queue_occ[1], BASE_FLOAT, REPLAY_USE},	//###45
-        {"%hhu ",   &db_urms_status.queue_stat[1].vol, BASE_CHAR, REPLAY_USE},	//###46
-        {"%hu ",   &urms_datafile.metering_rate[1], BASE_SHORT, REPLAY_USE},	//###47
-        {"%hhu ",   &db_urms_status.cmd_src[1], BASE_CHAR, REPLAY_USE},		//###48
-        {"%hhu ",   &db_urms_status.action[1], BASE_CHAR, REPLAY_USE},		//###49
+        {"%hhu ",   &db_urms_status.metered_lane_stat[1].demand_vol, BASE_CHAR, REPLAY_USE},	//###44
+        {"%hhu ",   &db_urms_status.metered_lane_stat[1].passage_vol, BASE_CHAR, REPLAY_USE},	//###45
+        {"%.1f ",   &urms_datafile.queue_occ[1], BASE_FLOAT, REPLAY_USE},	//###46
+        {"%hhu ",   &db_urms_status.queue_stat[1].vol, BASE_CHAR, REPLAY_USE},	//###47
+        {"%hu ",   &urms_datafile.metering_rate[1], BASE_SHORT, REPLAY_USE},	//###48
+        {"%hhu ",   &db_urms_status.cmd_src[1], BASE_CHAR, REPLAY_USE},		//###49
+        {"%hhu ",   &db_urms_status.action[1], BASE_CHAR, REPLAY_USE},		//###50
+        {"%hhu ",   &db_urms_status.plan[1], BASE_CHAR, REPLAY_USE},		//###51
 
-        {"%hhu ",   &db_urms_status.metered_lane_stat[2].demand_vol, BASE_CHAR, REPLAY_USE},	//###50
-        {"%hhu ",   &db_urms_status.metered_lane_stat[2].passage_vol, BASE_CHAR, REPLAY_USE},	//###51
-        {"%.1f ",   &urms_datafile.queue_occ[2], BASE_FLOAT, REPLAY_USE},	//###52
-        {"%hhu ",   &db_urms_status.queue_stat[2].vol, BASE_CHAR, REPLAY_USE},	//###53
-        {"%hu ",   &urms_datafile.metering_rate[2], BASE_SHORT, REPLAY_USE},	//###54
-        {"%hhu ",   &db_urms_status.cmd_src[2], BASE_CHAR, REPLAY_USE},		//###55
-        {"%hhu ",   &db_urms_status.action[2], BASE_CHAR, REPLAY_USE},		//###56
-        {"%hhu ",   &db_urms_status.rm2rmc_ctr, BASE_CHAR, REPLAY_USE},		//###57
-        {"%hhu ",   &db_urms_status.rmc2ac_ctr, BASE_CHAR, REPLAY_USE},		//###58
-        {"%hhu ",   &db_urms_status.is_metering, BASE_CHAR, REPLAY_USE},		//###59
+        {"%hhu ",   &db_urms_status.metered_lane_stat[2].demand_vol, BASE_CHAR, REPLAY_USE},	//###52
+        {"%hhu ",   &db_urms_status.metered_lane_stat[2].passage_vol, BASE_CHAR, REPLAY_USE},	//###53
+        {"%.1f ",   &urms_datafile.queue_occ[2], BASE_FLOAT, REPLAY_USE},	//###54
+        {"%hhu ",   &db_urms_status.queue_stat[2].vol, BASE_CHAR, REPLAY_USE},	//###55
+        {"%hu ",    &urms_datafile.metering_rate[2], BASE_SHORT, REPLAY_USE},	//###56
+        {"%hhu ",   &db_urms_status.cmd_src[2], BASE_CHAR, REPLAY_USE},		//###57
+        {"%hhu ",   &db_urms_status.action[2], BASE_CHAR, REPLAY_USE},		//###58
+        {"%hhu ",   &db_urms_status.plan[2], BASE_CHAR, REPLAY_USE},		//###59
+        {"%hhu ",   &db_urms_status.rm2rmc_ctr, BASE_CHAR, REPLAY_USE},		//###60
+        {"%hhu ",   &db_urms_status.rmc2ac_ctr, BASE_CHAR, REPLAY_USE},		//###61
+	{"%hhu ",   &db_urms_status.is_metering, BASE_CHAR, REPLAY_USE},	//###62
+
 
 
 //        {"%hhu ",   &status.err, BASE_CHAR, REPLAY_USE},			//###48
