@@ -29,7 +29,7 @@ echo "Starting clt_vars"
 sleep 1
 
 echo "Starting urms"
-/home/atsc/urms/lnx/urms -r 10.0.1.126 -i 1000 -v &
+/home/atsc/urms/lnx/urms -r 10.0.1.126 -i 1000 &
 sleep 1
 
 echo "Starting send_urms"
@@ -38,4 +38,4 @@ sleep 1
 
 #echo "Starting wrfiles_ac_rm"
 /home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -d /big/data/ac_rm_1 -m 15 &
-
+#/home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -d /big/data/ac_rm_1 -o
