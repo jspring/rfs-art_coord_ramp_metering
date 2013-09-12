@@ -29,7 +29,7 @@ echo "Starting clt_vars"
 sleep 1
 
 echo "Starting urms"
-/home/atsc/urms/lnx/urms -r 10.0.1.126 -i 1000 &
+/home/atsc/urms/lnx/urms -r 10.0.1.126 -i 100 &
 sleep 1
 
 echo "Starting send_urms"
