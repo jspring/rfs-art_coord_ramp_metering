@@ -122,6 +122,7 @@ data_log_column_spec_t file_spec[] =
 	{"%hhu ",   &db_urms_status.is_metering, BASE_CHAR, REPLAY_USE},	//###62
 	{"%hhu ",   &phase_status.barrier_flag, BASE_CHAR, REPLAY_USE},		//###63
 	{"%hhu ",   &db_urms_status.computation_finished, BASE_CHAR, REPLAY_USE}, //###64
+	{"%hx ",   &db_urms_status.checksum, BASE_CHAR, REPLAY_USE}, 		//###65
 
 
 
