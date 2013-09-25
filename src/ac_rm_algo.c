@@ -49,10 +49,11 @@ int db_trig_list_algo[] =  {
 
 int NUM_TRIG_VARS_ALGO = sizeof(db_trig_list_algo)/sizeof(int);
 
+extern db_clt_typ *pclt;              /* Database client pointer */
+extern db_urms_status_t db_urms_status;
 
 int main( int argc, char *argv[]) {
 
-	db_clt_typ *pclt;              /* Database client pointer */
 	char hostname[MAXHOSTNAMELEN];
 	char *domain = DEFAULT_SERVICE;
 	int xport = COMM_OS_XPORT;
@@ -62,7 +63,6 @@ int main( int argc, char *argv[]) {
 	db_urms_t db_urms;
 	get_long_status8_resp_mess_typ get_long_status8_resp_mess;
 	get_short_status_resp_t short_status;
-	db_urms_status_t db_urms_status;
 
         int ipc_message_error_ctr = 0;
 	int retval = 0;
@@ -74,8 +74,7 @@ int main( int argc, char *argv[]) {
 
 	int interval = 1000;
 	int verbose = 0;
-/******* Dongyan's code *****************************************************/
-/****************************************************************************/
+
 	char filename[128]="measurement_data.txt";
 	char meter_datafile[128]="meter_data.txt";
 	//variables for the intersection measurement
@@ -99,15 +98,12 @@ int main( int argc, char *argv[]) {
 	FILE *fp_m = fopen(meter_datafile,"r");
 	if(fp_m==NULL)
 		return -1;	
-/*******************************************************************************************************************/
-/*******************************************************************************************************************/
 
 	get_local_name(hostname, MAXHOSTNAMELEN);
 	if ( ((pclt = db_list_init(argv[0], hostname,
 		domain, xport, NULL, 0, 
 		db_trig_list_algo, NUM_TRIG_VARS_ALGO)) == NULL))
 		exit(EXIT_FAILURE);
-printf("ac_rm_algo: Got to 1\n");
 	if (setjmp(exit_env) != 0) {
 		db_list_done(pclt, NULL, 0, NULL, 0);
 		printf("%s: %d IPC message errors\n", argv[0], 
@@ -128,7 +124,6 @@ printf("ac_rm_algo: Got to 1\n");
 			if(verbose)
 				printf("Got DB_TSCP_STATUS_VAR\n");
 		}
-
 		//Read in ramp & mainline data
                 if( DB_TRIG_VAR(&trig_info) == DB_URMS_STATUS_VAR ) {
                         db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
