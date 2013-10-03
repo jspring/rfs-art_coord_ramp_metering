@@ -6,6 +6,10 @@
 #include "variables.h"
 #include "interface.h"
 
+extern int old_phase6_signal_status;
+extern int ramp_flag;
+extern int signal_flag;
+
 int get_new_data(char str[],struct signal_variables *psignal_data,struct ramp_variables *pramp_data);
 
 bool check_mainline_occ_health_lead(struct ramp_variables* pramp_data,int lane_id);

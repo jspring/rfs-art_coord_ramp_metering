@@ -1,7 +1,6 @@
 
 #include "init.h"
-
-extern float get_update_time_ramp(struct ramp_variables *pramp_data);
+#include "interface.h"
 
 //these three functions need to disc
 float get_init_ramp_queue()

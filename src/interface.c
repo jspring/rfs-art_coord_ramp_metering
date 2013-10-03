@@ -2,6 +2,7 @@
 
 #include "interface.h"
 
+/*
 float get_occ_main_lead_1(void)
 {
 	return lead_occ_0;
@@ -51,6 +52,9 @@ int get_vol_main_trail_3(void)
 {
 	return trail_vol_2;
 }
+*/
+
+
 
 int get_status_main_lead_1(void)
 {
@@ -76,6 +80,11 @@ int get_status_main_trail_3(void)
 {
 	return trail_stat_2;
 }
+
+
+
+
+/*
 float get_occ_metered_queue_1(void)
 {
 	return queue_occ_0;
@@ -130,6 +139,10 @@ int get_vol_metered_demand_3(void)
 {
 	return demand_vol_2;
 }
+*/
+
+
+
 float get_rate_metered_1(void)
 {
 	return rate_0;

@@ -1,7 +1,6 @@
 #include <db_include.h>
 #include "control_compute.h"
-
-extern float get_current_time(void);
+#include "interface.h"
 
 int get_detector_occ_count(int data[][MAXCOL], int first_row, int last_row, int det_col)
 {

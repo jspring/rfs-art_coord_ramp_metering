@@ -5,6 +5,8 @@
 #include "variables2.h"
 #include "variables.h"
 
+extern float get_current_time();
+/*
 float get_occ_main_lead_1(void);
 
 float get_occ_main_trail_1(void);
@@ -28,6 +30,7 @@ int get_vol_main_trail_2(void);
 int get_vol_main_lead_3(void);
 
 int get_vol_main_trail_3(void);
+*/
 
 int get_status_main_lead_1(void);
 
@@ -40,7 +43,7 @@ int get_status_main_trail_1(void);
 int get_status_main_trail_2(void);
 
 int get_status_main_trail_3(void);
-
+/*
 float get_occ_metered_queue_1(void);
 
 int get_vol_metered_queue_1(void);
@@ -65,6 +68,7 @@ int get_vol_metered_demand_2(void);
 
 int get_vol_metered_demand_3(void);
 
+*/
 float get_rate_metered_1(void);
 
 float get_rate_metered_2(void);
@@ -95,8 +99,6 @@ int get_phase7_signal_status();
 
 int get_phase3_signal_status();
 
-float get_current_time();
 
 int set_new_max_green_phase3(int x);
-
 #endif

@@ -1,6 +1,8 @@
 #ifndef		_VARIABLES_H_
 #define		_VARIABLES_H_
 
+#undef _VARIABLES_H_DECLS
+//#define _VARIABLES_H_DECLS
 #ifndef _VARIABLES_H_DECLS
 #define _DECL extern
 #define _INIT(x)

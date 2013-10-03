@@ -122,5 +122,4 @@ _DECL struct ramp_variables
 } ramp_data;
 
 
-
 #endif

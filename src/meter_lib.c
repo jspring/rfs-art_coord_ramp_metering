@@ -27,6 +27,7 @@ int get_meter_measurement(FILE *fp, double *freeway_occ, double *freeway_flow, d
 		return 0;
 }
 
+/*
 double get_meter_rate(double occ, double q_r, double q_in)
 {
 	//occ is mainline upstream occ, q_r is ramp flow(current meter rate), q_in is mainline upstream measured flow
@@ -43,6 +44,7 @@ double get_meter_rate(double occ, double q_r, double q_in)
 	new_rate=(double)(int)new_rate;
 	return new_rate;
 }
+*/
 int send_meter_rate(double meter_rate)
 {
 	printf("%5.2lf\n",meter_rate);
@@ -55,6 +57,8 @@ float get_occ_main_lead_1(void) {
 
 	db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
 	ml_lead_occ_1 = ((db_urms_status.mainline_stat[0].lead_occ_msb << 8) + (unsigned char)(db_urms_status.mainline_stat[0].lead_occ_lsb)) / 10.0;
+//printf("get_occ_main_lead_1: db_urms_status mainline 1 calc occ %f\n", (float)(((db_urms_status.mainline_stat[0].lead_occ_msb << 8) + (unsigned char)(db_urms_status.mainline_stat[0].lead_occ_lsb)) / 10.0));
+
 	if( (ml_lead_occ_1 < 0) || (ml_lead_occ_1 > 100))
 		return -1;
 	return ml_lead_occ_1;

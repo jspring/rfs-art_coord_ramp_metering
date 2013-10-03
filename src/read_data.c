@@ -1,5 +1,10 @@
 #include <db_include.h>
 #include "read_data.h"
+#include "meter_lib.h"
+
+int old_phase6_signal_status;
+int ramp_flag;
+int signal_flag;
 
 int get_new_data(char str[],struct signal_variables *psignal_data,struct ramp_variables *pramp_data)
 {
@@ -161,6 +166,8 @@ float get_mainline_average_occupancy(struct ramp_variables* pramp_data)
 			pramp_data->mainline_avg_occupancy[lane_id] = pramp_data->mainline_lead_occ[i][lane_id];
 		else if (trail_health)
 			pramp_data->mainline_avg_occupancy[lane_id] = pramp_data->mainline_trail_occ[i][lane_id];
+		else
+			return -1;
 	}
 	return 0;
 }
@@ -270,6 +277,7 @@ int get_new_ramp_data(struct ramp_variables* pramp_data)
 	pramp_data->mainline_trail_vol[i][2] = get_vol_main_trail_3();
 
 	pramp_data->mainline_lead_occ[i][0] = get_occ_main_lead_1();
+printf("get_new_ramp_data: pramp_data->mainline_lead_occ[%d][0] %f\n", i, pramp_data->mainline_lead_occ[i][0]);
 	pramp_data->mainline_lead_occ[i][1] = get_occ_main_lead_2();
 	pramp_data->mainline_lead_occ[i][2] = get_occ_main_lead_3();
 
