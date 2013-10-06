@@ -68,12 +68,12 @@ int get_vol_metered_demand_2(void);
 
 int get_vol_metered_demand_3(void);
 
-*/
 float get_rate_metered_1(void);
 
 float get_rate_metered_2(void);
 
 float get_rate_metered_3(void);
+*/
 
 float get_data_time(void);
 

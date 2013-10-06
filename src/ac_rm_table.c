@@ -7,6 +7,7 @@
 #include <ab3418comm.h>
 #include <urms.h>
 #include "wrfiles_ac_rm.h"
+#include "variables2.h"
 
 char *interval_str[] = {
 "Walk", 
@@ -33,6 +34,8 @@ phase_status_t	phase_status;
 db_urms_status_t db_urms_status;
 urms_datafile_t urms_datafile;
 timestamp_t timestamp;
+db_ramp_data_t db_ramp_data;
+db_signal_data_t db_signal_data;
 
 /**
  *      This array is used to specify how to read in the DB vars.
@@ -43,7 +46,9 @@ db_var_spec_t db_vars_ac_rm[] =
         {DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &status},
         {DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status},
         {DB_URMS_DATAFILE_VAR, sizeof(urms_datafile_t), &urms_datafile},
-        {DB_PHASE_STATUS_VAR, sizeof(phase_status_t), &phase_status}
+        {DB_PHASE_STATUS_VAR, sizeof(phase_status_t), &phase_status},
+        {DB_SIGNAL_DATA_VAR, sizeof(db_signal_data_t), &db_signal_data},
+        {DB_RAMP_DATA_VAR, sizeof(db_ramp_data_t), &db_ramp_data}
 };
 int num_ac_rm_vars = (sizeof(db_vars_ac_rm)/sizeof(db_var_spec_t));
 
@@ -122,16 +127,32 @@ data_log_column_spec_t file_spec[] =
 	{"%hhu ",   &db_urms_status.is_metering, BASE_CHAR, REPLAY_USE},	//###62
 	{"%hhu ",   &phase_status.barrier_flag, BASE_CHAR, REPLAY_USE},		//###63
 	{"%hhu ",   &db_urms_status.computation_finished, BASE_CHAR, REPLAY_USE}, //###64
-	{"%hx ",   &db_urms_status.checksum, BASE_CHAR, REPLAY_USE}, 		//###65
-
-
-
-//        {"%hhu ",   &status.err, BASE_CHAR, REPLAY_USE},			//###48
-//        {"%hhu ",   &status.errindex, BASE_CHAR, REPLAY_USE},			//###49
-
-        //Current acceleration received from n cars ahead
-//        {"%.2f ",   &m56_m430.host_rx_xg_491, BASE_FLOAT, REPLAY_USE},	//###7
-//        {"%u ",   &m56_m431.message_timeout_counter, BASE_INT, REPLAY_USE},	//###8
+	{"%hx ",    &db_urms_status.checksum, BASE_CHAR, REPLAY_USE}, 		//###65
+        {"%hu ",    &urms_datafile.metering_rate[2], BASE_SHORT, REPLAY_USE},	//###66
+	{"%.1f ",   &db_ramp_data.new_meter_rate, BASE_FLOAT, REPLAY_USE}, 	//###67
+	{"%d ",   &db_signal_data.old_max_green, BASE_INT, REPLAY_USE}, 	//###68
+	{"%d ",   &db_signal_data.new_max_green, BASE_INT, REPLAY_USE}, 	//###69
+	{"%.1f ",   &db_signal_data.LT_occ, BASE_FLOAT, REPLAY_USE}, 		//###70
+	{"%.1f ",   &db_signal_data.old_LT_occ, BASE_FLOAT, REPLAY_USE}, 	//###71
+	{"%.1f ",   &db_signal_data.RT_occ, BASE_FLOAT, REPLAY_USE}, 		//###72
+	{"%.1f ",   &db_signal_data.ramp_queue, BASE_FLOAT, REPLAY_USE}, 	//###73
+	{"%.1f ",   &db_signal_data.old_ramp_queue, BASE_FLOAT, REPLAY_USE}, 	//###74
+	{"%d ",   &db_signal_data.RT_exceed_num, BASE_INT, REPLAY_USE}, 	//###75
+	{"%d ",   &db_signal_data.last_sent_max_green, BASE_INT, REPLAY_USE}, 	//###76
+	{"%d ",   &db_signal_data.data_row, BASE_INT, REPLAY_USE}, 		//###77
+	{"%d ",   &db_signal_data.regular_remain_cycle, BASE_INT, REPLAY_USE}, 	//###78
+	{"%d ",   &db_signal_data.overwrite_remain_cycle, BASE_INT, REPLAY_USE}, //###79
+	{"%d ",   &db_signal_data.cycle_passed, BASE_INT, REPLAY_USE}, 		//###80
+	{"%.1f ",   &db_signal_data.prev_cycle_terminate_time, BASE_FLOAT, REPLAY_USE}, //###81
+	{"%.1f ",   &db_signal_data.current_cycle_terminate_time, BASE_FLOAT, REPLAY_USE}, //###82
+	{"%.1f ",   &db_signal_data.prev_queue_reset_time, BASE_FLOAT, REPLAY_USE}, //###83
+	{"%u ",   &db_signal_data.regular_release, BASE_INT, REPLAY_USE}, 	//###84
+	{"%u ",   &db_signal_data.overwrite_release, BASE_INT, REPLAY_USE}, 	//###85
+	{"%d ",   &db_signal_data.realtime_data, BASE_INT, REPLAY_USE}, 	//###86
+	{"%.1f ",   &db_ramp_data.data_time, BASE_FLOAT, REPLAY_USE}, 		//###87
+	{"%.1f ",   &db_ramp_data.prev_update_data, BASE_FLOAT, REPLAY_USE}, 	//###88
+	{"%.1f ",   &db_ramp_data.prev_occ_out, BASE_FLOAT, REPLAY_USE}, 	//###89
+	{"%hhu ",   &db_ramp_data.passage_vol[2], BASE_CHAR, REPLAY_USE}, 	//###90
 };
 
 #define NUM_FILE_COLUMNS sizeof(file_spec)/sizeof(data_log_column_spec_t)

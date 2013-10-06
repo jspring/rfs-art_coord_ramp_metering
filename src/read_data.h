@@ -12,13 +12,13 @@ extern int signal_flag;
 
 int get_new_data(char str[],struct signal_variables *psignal_data,struct ramp_variables *pramp_data);
 
-bool check_mainline_occ_health_lead(struct ramp_variables* pramp_data,int lane_id);
+unsigned int check_mainline_occ_health_lead(struct ramp_variables* pramp_data,int lane_id);
 
-bool check_mainline_occ_health_trail(struct ramp_variables* pramp_data,int lane_id);
+unsigned int check_mainline_occ_health_trail(struct ramp_variables* pramp_data,int lane_id);
 
-bool check_mainline_vol_health_lead(struct ramp_variables* pramp_data,int lane_id);
+unsigned int check_mainline_vol_health_lead(struct ramp_variables* pramp_data,int lane_id);
 
-bool check_mainline_vol_health_trail(struct ramp_variables* pramp_data,int lane_id);
+unsigned int check_mainline_vol_health_trail(struct ramp_variables* pramp_data,int lane_id);
 
 float get_mainline_average_occupancy(struct ramp_variables* pramp_data);
 

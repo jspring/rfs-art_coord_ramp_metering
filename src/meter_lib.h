@@ -38,3 +38,16 @@ extern float get_occ_metered_queue_3(void);
 extern int get_vol_metered_queue_3(void);
 extern int get_vol_metered_demand_3(void);
 extern int get_vol_metered_passage_3(void);
+
+extern float get_rate_metered_1(void);
+extern float get_rate_metered_2(void);
+extern float get_rate_metered_3(void);
+extern unsigned char get_ramp_flag(void);
+extern unsigned char get_barrier_flag(void);
+extern int get_status_main_lead_1(void);
+extern int get_status_main_trail_1(void);
+extern int get_status_main_lead_2(void);
+extern int get_status_main_trail_2(void);
+extern int get_status_main_lead_3(void);
+extern int get_status_main_trail_3(void);
+extern int get_current_max_green(void);

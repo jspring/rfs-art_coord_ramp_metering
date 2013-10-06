@@ -23,13 +23,13 @@ float get_meter_rate(struct ramp_variables *pramp_data);
 
 int get_intersection_measurement(struct signal_variables* psignal_data,struct ramp_variables *pramp_data);
 
-bool need_reduce_max_green(struct signal_variables *psignal_data);
+unsigned int need_reduce_max_green(struct signal_variables *psignal_data);
 
-bool check_activation_via_queue_occ(struct ramp_variables *pramp_data);
+unsigned int check_activation_via_queue_occ(struct ramp_variables *pramp_data);
 
-bool check_activation_via_intersection_occ(struct signal_variables* psignal_data);
+unsigned int check_activation_via_intersection_occ(struct signal_variables* psignal_data);
 
-bool check_activation_via_queue_estimation(struct signal_variables *psignal_data);
+unsigned int check_activation_via_queue_estimation(struct signal_variables *psignal_data);
 
 float get_ramp_exit_vol(struct ramp_variables* pramp_data, float t1, float t2);
 
@@ -39,7 +39,7 @@ float get_detector_counts(int data[][MAXCOL],int max_row,int sig_col,int det_col
 
 float get_ramp_queue(struct signal_variables *psignal_data,struct ramp_variables *pramp_data);
 
-bool IS_activation(struct signal_variables* psignal_data,struct ramp_variables* pramp_data);
+unsigned int IS_activation(struct signal_variables* psignal_data,struct ramp_variables* pramp_data);
 
 int get_new_max_green_phase3(struct signal_variables* psignal_data,struct ramp_variables* pramp_data);
 

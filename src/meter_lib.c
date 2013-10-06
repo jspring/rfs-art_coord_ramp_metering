@@ -1,5 +1,6 @@
 #include "meter_lib.h"
 #include <urms.h>
+#include <ab3418_lib.h>
 
 #define LAMBDA_IN 2
 #define LAMBDA_OUT 3
@@ -11,6 +12,8 @@
 
 db_clt_typ *pclt;
 db_urms_status_t db_urms_status;
+phase_status_t phase_status;
+phase_timing_t phase_timing;
 
 int send_freeway_data()
 {
@@ -316,3 +319,138 @@ int get_vol_metered_passage_3(void) {
 		return -1;
 	return metered_passage_vol_3;
 }
+
+float get_rate_metered_1(void) {
+
+	float metered_1_rate = -1;
+
+	db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+	metered_1_rate = ((db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char)(db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb));
+	if(metered_1_rate < 0)
+		return -1;
+	return metered_1_rate;
+}
+
+float get_rate_metered_2(void) {
+
+	float metered_2_rate = -1;
+
+	db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+	metered_2_rate = ((db_urms_status.metered_lane_stat[1].metered_lane_rate_msb << 8) + (unsigned char)(db_urms_status.metered_lane_stat[1].metered_lane_rate_lsb));
+	if(metered_2_rate < 0)
+		return -1;
+	return metered_2_rate;
+}
+
+float get_rate_metered_3(void) {
+
+	float metered_3_rate = -1;
+
+	db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+	metered_3_rate = ((db_urms_status.metered_lane_stat[2].metered_lane_rate_msb << 8) + (unsigned char)(db_urms_status.metered_lane_stat[2].metered_lane_rate_lsb));
+	if(metered_3_rate < 0)
+		return -1;
+	return metered_3_rate;
+}
+
+unsigned char get_ramp_flag(void) {
+
+	unsigned char ramp_flag = 0;
+
+	db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+	ramp_flag = db_urms_status.computation_finished;
+	if(ramp_flag)
+		printf("get_ramp_flag: got ramp flag; statistics display on ramp meter controller should have just changed\n");
+	return ramp_flag;
+}
+
+unsigned char get_barrier_flag(void) {
+
+	unsigned char barrier_flag = 0;
+
+	db_clt_read(pclt, DB_PHASE_STATUS_VAR, sizeof(phase_status_t), &phase_status);
+	barrier_flag = phase_status.barrier_flag;
+	if(barrier_flag)
+		printf("get_barrier_flag: got arterial barrier flag %hhu; phases 6 and 2 should be yellow now\n", barrier_flag);
+	return barrier_flag;
+}
+
+int get_status_main_lead_1(void)
+{
+	int mainline_1_lead_status = -1;
+
+	db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+	mainline_1_lead_status = db_urms_status.mainline_stat[0].lead_stat;
+	if(mainline_1_lead_status < 0)
+		return -1;
+	return mainline_1_lead_status;
+}
+
+int get_status_main_trail_1(void)
+{
+	int mainline_1_trail_status = -1;
+
+	db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+	mainline_1_trail_status = db_urms_status.mainline_stat[0].trail_stat;
+	if(mainline_1_trail_status < 0)
+		return -1;
+	return mainline_1_trail_status;
+}
+
+int get_status_main_lead_2(void)
+{
+	int mainline_2_lead_status = -1;
+
+	db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+	mainline_2_lead_status = db_urms_status.mainline_stat[1].lead_stat;
+	if(mainline_2_lead_status < 0)
+		return -1;
+	return mainline_2_lead_status;
+}
+
+int get_status_main_trail_2(void)
+{
+	int mainline_2_trail_status = -1;
+
+	db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+	mainline_2_trail_status = db_urms_status.mainline_stat[1].trail_stat;
+	if(mainline_2_trail_status < 0)
+		return -1;
+	return mainline_2_trail_status;
+}
+
+int get_status_main_lead_3(void)
+{
+	int mainline_3_lead_status = -1;
+
+	db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+	mainline_3_lead_status = db_urms_status.mainline_stat[2].lead_stat;
+	if(mainline_3_lead_status < 0)
+		return -1;
+	return mainline_3_lead_status;
+}
+
+int get_status_main_trail_3(void)
+{
+	int mainline_3_trail_status = -1;
+
+	db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+	mainline_3_trail_status = db_urms_status.mainline_stat[2].trail_stat;
+	if(mainline_3_trail_status < 0)
+		return -1;
+	return mainline_3_trail_status;
+}
+
+int get_current_max_green(void)
+{
+	int max_green = -1;
+
+	db_clt_read(pclt, DB_PHASE_3_TIMING_VAR, sizeof(phase_timing_t), &phase_timing);
+
+	max_green = phase_timing.min_green + phase_timing.max_green1;
+	if(max_green< 0)
+		return -1;
+	return max_green;
+}
+
+

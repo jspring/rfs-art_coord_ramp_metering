@@ -1,6 +1,7 @@
 
 #include "init.h"
 #include "interface.h"
+#include "meter_lib.h"
 
 //these three functions need to disc
 float get_init_ramp_queue()
@@ -13,18 +14,18 @@ float get_current_meter_rate()
 	return 900.0;
 }
 
+/*
 int get_current_max_green()
 {
 	return 25;
 }
-
+*/
 int init_signal(struct signal_variables* psignal_data)
 {
 
 	psignal_data->new_max_green=get_current_max_green();
 	psignal_data->last_sent_max_green=psignal_data->new_max_green;
 	psignal_data->old_max_green = psignal_data->new_max_green;
-
 
 	psignal_data->old_ramp_queue=get_init_ramp_queue();
 	psignal_data->regular_release=false;

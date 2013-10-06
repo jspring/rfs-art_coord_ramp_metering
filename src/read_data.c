@@ -8,7 +8,7 @@ int signal_flag;
 
 int get_new_data(char str[],struct signal_variables *psignal_data,struct ramp_variables *pramp_data)
 {
-	sscanf(str,"%f%c%f%c%f%hhu%hhu%hhx%hhx%hhx%hhx%hhx%hhx%hhx%hhx%hhx%hhx%hhx%hhx%hhx%hhx %hhu%hhu%f%hhu%hhu%f %hhu%hhu%f%hhu%hhu%f %hhu%hhu%hhu%f%hhu%f %hhu%hhu%f%hhu%hu%hhu%hhu%hhu %hhu%hhu%f%hhu%hu%hhu%hhu%hhu %hhu%hhu%f%hhu%hu%hhu%hhu%hhu",
+	sscanf(str,"%f%c%f%c%f%u%u%x%x%x%x%x%x%x%x%x%x%x%x%x%x %u%u%f%u%u%f %u%u%f%u%u%f %u%u%u%f%u%f %u%u%f%u%u%u%u%u %u%u%f%u%u%u%u%u %u%u%f%u%u%u%u%u",
 	&hr,&c1,&min,&c2,&sec,&a1,&a2,&a3,&a4,&a5,&a6,&a7,&a8,&green_yellow_overlap,&presence1,&presence2,&presence3,&presence4,&greens,&yellows,&reds,
 	&lead_stat_0,&lead_vol_0,&lead_occ_0,&trail_stat_0,&trail_vol_0,&trail_occ_0,
 	&lead_stat_1,&lead_vol_1,&lead_occ_1,&trail_stat_1,&trail_vol_1,&trail_occ_1,
@@ -35,15 +35,16 @@ int get_new_data(char str[],struct signal_variables *psignal_data,struct ramp_va
 	return 0;
 }
 
-bool check_mainline_occ_health_lead(struct ramp_variables* pramp_data,int lane_id)
+unsigned int check_mainline_occ_health_lead(struct ramp_variables* pramp_data,int lane_id)
 {
 	int i = NUMBER_RAMP_DATA-1;
 	int j;
 	int count;
-	bool flag;
+	unsigned int flag;
 
 	if(pramp_data->mainline_lead_status[i][lane_id]!=MAINLINE_DETECTOR_WORKING)
-		return false;
+//		return false;
+		return 0;
 
 	count = 0;
 	flag = false;
@@ -59,19 +60,21 @@ bool check_mainline_occ_health_lead(struct ramp_variables* pramp_data,int lane_i
 		}
 	}
 	if( count> i/2 && flag )
-		return false;
+//		return false;
+		return 0;
 	else
-		return true;
+//		return true;
+		return 1;
 }
 
-bool check_mainline_occ_health_trail(struct ramp_variables* pramp_data,int lane_id)
+unsigned int check_mainline_occ_health_trail(struct ramp_variables* pramp_data,int lane_id)
 {
 	int i = NUMBER_RAMP_DATA-1;
 	int j;
 	int count;
-	bool flag;
+	unsigned int flag;
 
-	if(pramp_data->mainline_trail_status[i][lane_id]!=MAINLINE_DETECTOR_DISABLE)
+	if(pramp_data->mainline_trail_status[i][lane_id]!=MAINLINE_DETECTOR_WORKING)
 		return false;
 
 	count = 0;
@@ -93,12 +96,12 @@ bool check_mainline_occ_health_trail(struct ramp_variables* pramp_data,int lane_
 		return true;
 }
 
-bool check_mainline_vol_health_lead(struct ramp_variables* pramp_data,int lane_id)
+unsigned int check_mainline_vol_health_lead(struct ramp_variables* pramp_data,int lane_id)
 {
 	int i = NUMBER_RAMP_DATA-1;
 	int j;
 	int count;
-	bool flag;
+	unsigned int flag;
 
 	if(pramp_data->mainline_lead_status[i][lane_id]!=MAINLINE_DETECTOR_WORKING)
 		return false;
@@ -121,14 +124,14 @@ bool check_mainline_vol_health_lead(struct ramp_variables* pramp_data,int lane_i
 	else
 		return true;
 }
-bool check_mainline_vol_health_trail(struct ramp_variables* pramp_data,int lane_id)
+unsigned int check_mainline_vol_health_trail(struct ramp_variables* pramp_data,int lane_id)
 {
 	int i = NUMBER_RAMP_DATA-1;
 	int j;
 	int count;
-	bool flag;
+	unsigned int flag;
 
-	if(pramp_data->mainline_trail_status[i][lane_id]!=MAINLINE_DETECTOR_DISABLE)
+	if(pramp_data->mainline_trail_status[i][lane_id]!=MAINLINE_DETECTOR_WORKING)
 		return false;
 
 	count = 0;
@@ -155,8 +158,10 @@ float get_mainline_average_occupancy(struct ramp_variables* pramp_data)
 {
 	int i = NUMBER_RAMP_DATA-1;
 	int lane_id;
-	int lead_health,trail_health;
-	for(lane_id=0;lane_id<NUMBER_MAINLINE_LANE-1;lane_id++)
+	unsigned int lead_health,trail_health;
+
+//printf("get_mainline_average_occupancy: ");
+	for(lane_id=0;lane_id<NUMBER_MAINLINE_LANE;lane_id++)
 	{
 		lead_health = check_mainline_occ_health_lead(pramp_data, lane_id);
 		trail_health = check_mainline_occ_health_trail(pramp_data,lane_id);
@@ -167,8 +172,10 @@ float get_mainline_average_occupancy(struct ramp_variables* pramp_data)
 		else if (trail_health)
 			pramp_data->mainline_avg_occupancy[lane_id] = pramp_data->mainline_trail_occ[i][lane_id];
 		else
-			return -1;
+			pramp_data->mainline_avg_occupancy[lane_id] = 0;
+//printf("ML[%d] %.1f lead_health %u trail_health %u ", lane_id, pramp_data->mainline_avg_occupancy[lane_id], lead_health, trail_health);
 	}
+//printf("\n");
 	return 0;
 }
 
@@ -277,7 +284,6 @@ int get_new_ramp_data(struct ramp_variables* pramp_data)
 	pramp_data->mainline_trail_vol[i][2] = get_vol_main_trail_3();
 
 	pramp_data->mainline_lead_occ[i][0] = get_occ_main_lead_1();
-printf("get_new_ramp_data: pramp_data->mainline_lead_occ[%d][0] %f\n", i, pramp_data->mainline_lead_occ[i][0]);
 	pramp_data->mainline_lead_occ[i][1] = get_occ_main_lead_2();
 	pramp_data->mainline_lead_occ[i][2] = get_occ_main_lead_3();
 
@@ -304,6 +310,7 @@ printf("get_new_ramp_data: pramp_data->mainline_lead_occ[%d][0] %f\n", i, pramp_
 	pramp_data->meter_rate[i][0] = get_rate_metered_1();
 	pramp_data->meter_rate[i][1] = get_rate_metered_2();
 	pramp_data->meter_rate[i][2] = get_rate_metered_3();
+//printf("get_new_ramp_data: pramp_data->meter_rate[%d][1] %f pramp_data->meter_rate[%d][2] %f\n", i, pramp_data->meter_rate[i][1], i, pramp_data->meter_rate[i][2]);
 
 	pramp_data->data_time[i] = get_data_time();
 
