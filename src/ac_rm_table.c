@@ -148,11 +148,20 @@ data_log_column_spec_t file_spec[] =
 	{"%.1f ",   &db_signal_data.prev_queue_reset_time, BASE_FLOAT, REPLAY_USE}, //###83
 	{"%u ",   &db_signal_data.regular_release, BASE_INT, REPLAY_USE}, 	//###84
 	{"%u ",   &db_signal_data.overwrite_release, BASE_INT, REPLAY_USE}, 	//###85
-	{"%d ",   &db_signal_data.realtime_data, BASE_INT, REPLAY_USE}, 	//###86
-	{"%.1f ",   &db_ramp_data.data_time, BASE_FLOAT, REPLAY_USE}, 		//###87
-	{"%.1f ",   &db_ramp_data.prev_update_data, BASE_FLOAT, REPLAY_USE}, 	//###88
-	{"%.1f ",   &db_ramp_data.prev_occ_out, BASE_FLOAT, REPLAY_USE}, 	//###89
-	{"%hhu ",   &db_ramp_data.passage_vol[2], BASE_CHAR, REPLAY_USE}, 	//###90
+	{"%.1f ",   &db_ramp_data.data_time, BASE_FLOAT, REPLAY_USE}, 		//###86
+	{"%.1f ",   &db_ramp_data.prev_update_data, BASE_FLOAT, REPLAY_USE}, 	//###87
+	{"%.1f ",   &db_ramp_data.prev_occ_out, BASE_FLOAT, REPLAY_USE}, 	//###88
+	{"%hhu ",   &db_ramp_data.passage_vol[2], BASE_CHAR, REPLAY_USE}, 	//###89
+	{"%d ",   &db_signal_data.realtime_data[PHASE5SIGNAL], BASE_INT, REPLAY_USE}, 	//###90
+	{"%d ",   &db_signal_data.realtime_data[PHASE5APPROACH1], BASE_INT, REPLAY_USE}, //###91
+	{"%d ",   &db_signal_data.realtime_data[PHASE5APPROACH2], BASE_INT, REPLAY_USE}, //###92
+	{"%d ",   &db_signal_data.realtime_data[PHASE5STOPBAR], BASE_INT, REPLAY_USE}, 	//###93
+	{"%d ",   &db_signal_data.realtime_data[PHASE8SIGNAL], BASE_INT, REPLAY_USE}, 	//###94
+	{"%d ",   &db_signal_data.realtime_data[PHASE8APPROACH], BASE_INT, REPLAY_USE}, //###95
+	{"%d ",   &db_signal_data.realtime_data[PHASE8STOPBAR], BASE_INT, REPLAY_USE}, 	//###96
+	{"%d ",   &db_signal_data.realtime_data[PHASE6SIGNAL], BASE_INT, REPLAY_USE}, 	//###97
+	{"%d ",   &db_signal_data.realtime_data[PHASE7SIGNAL], BASE_INT, REPLAY_USE}, 	//###98
+	{"%d ",   &db_signal_data.realtime_data[PHASE3SIGNAL], BASE_INT, REPLAY_USE}, 	//###99
 };
 
 #define NUM_FILE_COLUMNS sizeof(file_spec)/sizeof(data_log_column_spec_t)

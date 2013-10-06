@@ -308,36 +308,47 @@ int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data)
 		{
 			flag=get_new_max_green_phase3(psignal_data,pramp_data);
 			fprintf(signal_fp,"%f\t%f\t%f\t%f\t%f\t%d\t%d\n",get_current_time(),psignal_data->LT_occ,psignal_data->RT_occ,pramp_data->queue_occ[NUMBER_RAMP_DATA-1][1],psignal_data->ramp_queue,psignal_data->new_max_green,(int)count);
-			fflush(signal_fp);
+			fflush(NULL);
 			if (psignal_data->new_max_green!=psignal_data->last_sent_max_green)
 			{
 				set_new_max_green_phase3(psignal_data->new_max_green);
 				psignal_data->last_sent_max_green=psignal_data->new_max_green;
 			}
-			db_signal_data->LT_occ = psignal_data->LT_occ;
-			db_signal_data->old_LT_occ = psignal_data->old_LT_occ;
-			db_signal_data->RT_occ = psignal_data->RT_occ;
-			db_signal_data->ramp_queue = psignal_data->ramp_queue;
-			db_signal_data->old_ramp_queue = psignal_data->old_ramp_queue;
-			db_signal_data->RT_exceed_num = psignal_data->RT_exceed_num;
-			db_signal_data->new_max_green = psignal_data->new_max_green;
-			db_signal_data->old_max_green = psignal_data->old_max_green;
-			db_signal_data->last_sent_max_green = psignal_data->last_sent_max_green;
-			db_signal_data->data_row = psignal_data->data_row;
-			db_signal_data->regular_remain_cycle = psignal_data->regular_remain_cycle;
-			db_signal_data->overwrite_remain_cycle = psignal_data->overwrite_remain_cycle;
-			db_signal_data->cycle_passed = psignal_data->cycle_passed;
-			db_signal_data->prev_cycle_terminate_time = psignal_data->prev_cycle_terminate_time;
-			db_signal_data->current_cycle_terminate_time = psignal_data->current_cycle_terminate_time;
-			db_signal_data->prev_queue_reset_time = psignal_data->prev_queue_reset_time;
-			db_signal_data->regular_release = psignal_data->regular_release;
-			db_signal_data->overwrite_release = psignal_data->overwrite_release;
-			db_signal_data->realtime_data = psignal_data->realtime_data[MAXROW - 1][MAXCOL - 1];
-			db_clt_write(pclt, DB_SIGNAL_DATA_VAR, sizeof(db_signal_data_t), db_signal_data);
 		}
 		psignal_data->data_row=-1;
 		signal_flag = 0;
 	}
+
+	db_signal_data->LT_occ = psignal_data->LT_occ;
+	db_signal_data->old_LT_occ = psignal_data->old_LT_occ;
+	db_signal_data->RT_occ = psignal_data->RT_occ;
+	db_signal_data->ramp_queue = psignal_data->ramp_queue;
+	db_signal_data->old_ramp_queue = psignal_data->old_ramp_queue;
+	db_signal_data->RT_exceed_num = psignal_data->RT_exceed_num;
+	db_signal_data->new_max_green = psignal_data->new_max_green;
+	db_signal_data->old_max_green = psignal_data->old_max_green;
+	db_signal_data->last_sent_max_green = psignal_data->last_sent_max_green;
+	db_signal_data->data_row = psignal_data->data_row;
+	db_signal_data->regular_remain_cycle = psignal_data->regular_remain_cycle;
+	db_signal_data->overwrite_remain_cycle = psignal_data->overwrite_remain_cycle;
+	db_signal_data->cycle_passed = psignal_data->cycle_passed;
+	db_signal_data->prev_cycle_terminate_time = psignal_data->prev_cycle_terminate_time;
+	db_signal_data->current_cycle_terminate_time = psignal_data->current_cycle_terminate_time;
+	db_signal_data->prev_queue_reset_time = psignal_data->prev_queue_reset_time;
+	db_signal_data->regular_release = psignal_data->regular_release;
+	db_signal_data->overwrite_release = psignal_data->overwrite_release;
+        db_signal_data->realtime_data[PHASE5SIGNAL] = psignal_data->realtime_data[psignal_data->data_row][PHASE5SIGNAL];
+        db_signal_data->realtime_data[PHASE5APPROACH1] = psignal_data->realtime_data[psignal_data->data_row][PHASE5APPROACH1];
+        db_signal_data->realtime_data[PHASE5APPROACH2] = psignal_data->realtime_data[psignal_data->data_row][PHASE5APPROACH2];
+        db_signal_data->realtime_data[PHASE5STOPBAR] = psignal_data->realtime_data[psignal_data->data_row][PHASE5STOPBAR];
+        db_signal_data->realtime_data[PHASE8SIGNAL] = psignal_data->realtime_data[psignal_data->data_row][PHASE8SIGNAL];
+        db_signal_data->realtime_data[PHASE8APPROACH] = psignal_data->realtime_data[psignal_data->data_row][PHASE8APPROACH];
+        db_signal_data->realtime_data[PHASE8STOPBAR] = psignal_data->realtime_data[psignal_data->data_row][PHASE8STOPBAR];
+        db_signal_data->realtime_data[PHASE6SIGNAL] = psignal_data->realtime_data[psignal_data->data_row][PHASE6SIGNAL];
+        db_signal_data->realtime_data[PHASE7SIGNAL] = psignal_data->realtime_data[psignal_data->data_row][PHASE7SIGNAL];
+        db_signal_data->realtime_data[PHASE3SIGNAL] = psignal_data->realtime_data[psignal_data->data_row][PHASE3SIGNAL];
+	db_clt_write(pclt, DB_SIGNAL_DATA_VAR, sizeof(db_signal_data_t), db_signal_data);
+
 	if(QUEUE_RESET &&  get_current_time() - psignal_data->prev_queue_reset_time >=QUEUE_RESET_INTERVAL && METHOD_FOR_RAMP_QUEUE==1)
 	{
 		reset_ramp_queue(psignal_data);

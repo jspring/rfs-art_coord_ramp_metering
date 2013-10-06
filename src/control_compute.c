@@ -88,14 +88,22 @@ int check_phase8_signal(int data[][MAXCOL],int max_row)
 }
 int check_realtime_data_health(int data[][MAXCOL],int max_row)
 {
-	if(check_phase8_detector(data,max_row))
+	if(check_phase8_detector(data,max_row)){
+printf("check_phase8_detector = 1\n");
 		return 1;
-	if(check_phase5_detector(data,max_row))
+}
+	if(check_phase5_detector(data,max_row)){
+printf("check_phase5_detector = 1\n");
 		return 1;
-	if(check_phase8_signal(data,max_row))
+}
+	if(check_phase8_signal(data,max_row)){
+printf("check_phase8_signal = 1\n");
 		return 1;
-	if(check_phase5_signal(data,max_row))
+}
+	if(check_phase5_signal(data,max_row)){
+printf("check_phase5_signal = 1\n");
 		return 1;
+}
 	return 0;
 }
 

@@ -8,6 +8,7 @@ int signal_flag;
 
 int get_new_data(char str[],struct signal_variables *psignal_data,struct ramp_variables *pramp_data)
 {
+/*
 	sscanf(str,"%f%c%f%c%f%u%u%x%x%x%x%x%x%x%x%x%x%x%x%x%x %u%u%f%u%u%f %u%u%f%u%u%f %u%u%u%f%u%f %u%u%f%u%u%u%u%u %u%u%f%u%u%u%u%u %u%u%f%u%u%u%u%u",
 	&hr,&c1,&min,&c2,&sec,&a1,&a2,&a3,&a4,&a5,&a6,&a7,&a8,&green_yellow_overlap,&presence1,&presence2,&presence3,&presence4,&greens,&yellows,&reds,
 	&lead_stat_0,&lead_vol_0,&lead_occ_0,&trail_stat_0,&trail_vol_0,&trail_occ_0,
@@ -31,7 +32,7 @@ int get_new_data(char str[],struct signal_variables *psignal_data,struct ramp_va
 		if (get_phase6_signal_status()==1)
 			old_phase6_signal_status=1;
 	}
-
+*/
 	return 0;
 }
 

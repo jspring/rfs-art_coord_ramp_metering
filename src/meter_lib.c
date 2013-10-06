@@ -14,6 +14,7 @@ db_clt_typ *pclt;
 db_urms_status_t db_urms_status;
 phase_status_t phase_status;
 phase_timing_t phase_timing;
+get_long_status8_resp_mess_typ tscp_status;
 
 int send_freeway_data()
 {
@@ -453,4 +454,117 @@ int get_current_max_green(void)
 	return max_green;
 }
 
+int get_phase3_signal_status()
+{
+	int greens;
+	int yellows;
+
+	db_clt_read(pclt, DB_PHASE_STATUS_VAR, sizeof(phase_status_t), &phase_status);
+	greens = phase_status.greens;
+	yellows = phase_status.yellows;
+
+        if ((greens>>2)%2)
+                return 1;
+        else if ((yellows>>2)%2)
+                return 2;
+        else
+        return 0;
+}
+
+int get_phase5_signal_status()
+{
+	int greens;
+	int yellows;
+
+	db_clt_read(pclt, DB_PHASE_STATUS_VAR, sizeof(phase_status_t), &phase_status);
+	greens = phase_status.greens;
+	yellows = phase_status.yellows;
+
+        if ((greens>>4)%2)
+                return 1;
+        else if ((yellows>>4)%2)
+                return 2;
+        else
+        return 0;
+}
+
+int get_phase6_signal_status()
+{
+	int greens;
+	int yellows;
+
+	db_clt_read(pclt, DB_PHASE_STATUS_VAR, sizeof(phase_status_t), &phase_status);
+	greens = phase_status.greens;
+	yellows = phase_status.yellows;
+
+        if ((greens>>5)%2)
+                return 1;
+        else if ((yellows>>5)%2)
+                return 2;
+        else
+        return 0;
+}
+
+int get_phase7_signal_status()
+{
+	int greens;
+	int yellows;
+
+	db_clt_read(pclt, DB_PHASE_STATUS_VAR, sizeof(phase_status_t), &phase_status);
+	greens = phase_status.greens;
+	yellows = phase_status.yellows;
+
+        if ((greens>>6)%2)
+                return 1;
+        else if ((yellows>>6)%2)
+                return 2;
+        else
+        return 0;
+}
+
+// This is actually overlap B status
+int get_phase8_signal_status()
+{
+	int green_yellow_overlap;
+
+	db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &tscp_status);
+	green_yellow_overlap = tscp_status.green_yellow_overlap;
+        if ((green_yellow_overlap>>1)%2)
+                return 1;
+        else
+                return 0;
+}
+
+int get_phase5_approach1_status()
+{
+	db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &tscp_status);
+        return (tscp_status.presence3%2);
+}
+int get_phase5_approach2_status()
+{
+	db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &tscp_status);
+        return (tscp_status.presence3>>2)%2;
+}
+int get_phase5_stopbar_status()
+{
+	db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &tscp_status);
+        return (tscp_status.presence2>>4)%2;
+}
+
+// This is actually the advance detector for phase 6 RT
+// (i.e. overlap B)
+int get_phase8_approach_status()
+{
+	db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &tscp_status);
+        //return rand() / (double)RAND_MAX<0.4;
+        return (tscp_status.presence1>>1)%2;
+}
+
+// This is actually the stop bar detector for phase 6 RT
+// (i.e. overlap B)
+int get_phase8_stopbar_status()
+{
+	db_clt_read(pclt, DB_TSCP_STATUS_VAR, sizeof(get_long_status8_resp_mess_typ), &tscp_status);
+        return (tscp_status.presence3>>5)%2;
+}
 

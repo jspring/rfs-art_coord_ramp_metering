@@ -143,7 +143,7 @@ typedef struct
 	float current_cycle_terminate_time;
 	float prev_queue_reset_time;
 	unsigned int regular_release,overwrite_release;
-	int realtime_data;
+	int realtime_data[MAXCOL];
 
 } IS_PACKED db_signal_data_t;
 

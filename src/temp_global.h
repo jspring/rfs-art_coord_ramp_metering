@@ -8,7 +8,8 @@
 #endif
 
 _DECL	float hr,min,sec;
-_DECL	int green_yellow_overlap,presence1,presence2,presence3,presence4,greens,yellows,reds;
+//_DECL	int green_yellow_overlap,presence1,presence2,presence3,presence4,greens,yellows,reds;
+_DECL	int green_yellow_overlap,presence1,presence2,presence3,presence4,yellows,reds;
 	//redudant
 _DECL	char c1,c2;
 _DECL	unsigned int a1,a2,a3,a4,a5,a6,a7,a8;

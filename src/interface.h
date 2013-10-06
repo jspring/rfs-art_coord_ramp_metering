@@ -79,25 +79,25 @@ float get_data_time(void);
 
 float get_update_time_ramp(struct ramp_variables *pramp_data);
 
-int get_phase5_signal_status();
+//int get_phase5_signal_status();
 
-int get_phase8_signal_status();
+//int get_phase8_signal_status();
 
-int get_phase5_approach1_status();
+//int get_phase5_approach1_status();
 
-int get_phase5_approach2_status();
+//int get_phase5_approach2_status();
 
-int get_phase5_stopbar_status();
+//int get_phase5_stopbar_status();
 
-int get_phase8_approach_status();
+//int get_phase8_approach_status();
 
-int get_phase8_stopbar_status();
+//int get_phase8_stopbar_status();
 
-int get_phase6_signal_status();
+//int get_phase6_signal_status();
 
-int get_phase7_signal_status();
+//int get_phase7_signal_status();
 
-int get_phase3_signal_status();
+//int get_phase3_signal_status();
 
 
 int set_new_max_green_phase3(int x);
