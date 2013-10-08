@@ -10,6 +10,7 @@
 #include "data_log.h"
 #include "wrfiles_ac_rm.h"
 #include "variables2.h"
+#include "ac_rm_algo.h"
 
 db_id_t db_vars_list[] =  {
         {DB_URMS_VAR, sizeof(db_urms_t)},

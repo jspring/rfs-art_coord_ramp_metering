@@ -1,6 +1,7 @@
 #include <db_include.h>
 #include "control_compute.h"
-#include "interface.h"
+
+extern float get_current_time(void);
 
 int get_detector_occ_count(int data[][MAXCOL], int first_row, int last_row, int det_col)
 {
@@ -88,22 +89,14 @@ int check_phase8_signal(int data[][MAXCOL],int max_row)
 }
 int check_realtime_data_health(int data[][MAXCOL],int max_row)
 {
-	if(check_phase8_detector(data,max_row)){
-printf("check_phase8_detector = 1\n");
+	if(check_phase8_detector(data,max_row))
 		return 1;
-}
-	if(check_phase5_detector(data,max_row)){
-printf("check_phase5_detector = 1\n");
+	if(check_phase5_detector(data,max_row))
 		return 1;
-}
-	if(check_phase8_signal(data,max_row)){
-printf("check_phase8_signal = 1\n");
+	if(check_phase8_signal(data,max_row))
 		return 1;
-}
-	if(check_phase5_signal(data,max_row)){
-printf("check_phase5_signal = 1\n");
+	if(check_phase5_signal(data,max_row))
 		return 1;
-}
 	return 0;
 }
 
@@ -130,7 +123,7 @@ int get_intersection_measurement(struct signal_variables* psignal_data,struct ra
 
 
 
-unsigned int need_reduce_max_green(struct signal_variables *psignal_data)
+bool need_reduce_max_green(struct signal_variables *psignal_data)
 {
 	
 	if(psignal_data->LT_occ>LT_OCC_THRESHOLD)
@@ -142,7 +135,7 @@ unsigned int need_reduce_max_green(struct signal_variables *psignal_data)
 		return false;
 	}
 }
-unsigned int check_activation_via_queue_occ(struct ramp_variables *pramp_data)
+bool check_activation_via_queue_occ(struct ramp_variables *pramp_data)
 {
 	if (pramp_data->queue_occ[NUMBER_RAMP_DATA][1]>QUEUE_OCC_THRESHOLD_TO_ACTIVATE_INTERSECTION)
 		return true;
@@ -150,7 +143,7 @@ unsigned int check_activation_via_queue_occ(struct ramp_variables *pramp_data)
 		return false;
 }
 
-unsigned int check_activation_via_intersection_occ(struct signal_variables* psignal_data)
+bool check_activation_via_intersection_occ(struct signal_variables* psignal_data)
 {
 	if( psignal_data->LT_occ>LEFT_OCC_THRESHOLD_TO_ACTIVATE_INTERSECTION || psignal_data->RT_occ>RIGHT_OCC_THRESHOLD_TO_ACTIVATE_INTERSECTION )
 		return true;
@@ -158,7 +151,7 @@ unsigned int check_activation_via_intersection_occ(struct signal_variables* psig
 		return false;
 }
 
-unsigned int check_activation_via_queue_estimation(struct signal_variables *psignal_data)
+bool check_activation_via_queue_estimation(struct signal_variables *psignal_data)
 {
 	if(psignal_data->ramp_queue>RAMP_QUEUE_THRESHOLD)
 		return true;
@@ -275,7 +268,7 @@ float get_ramp_queue(struct signal_variables *psignal_data,struct ramp_variables
 	return min(100,max(psignal_data->old_ramp_queue+LT_vol+RT_vol-ramp_exit_vol,0));
 }
 
-unsigned int IS_activation(struct signal_variables* psignal_data,struct ramp_variables* pramp_data)
+bool IS_activation(struct signal_variables* psignal_data,struct ramp_variables* pramp_data)
 {
 	switch (METHOD_FOR_RAMP_QUEUE)
 	{
@@ -370,26 +363,8 @@ float get_ALINEA_rate(struct ramp_variables* pramp_data)
 	float current_rate;
 	float new_rate;
 	float occ_in = (pramp_data->mainline_avg_occupancy[1] + pramp_data->mainline_avg_occupancy[2])/2.0;
-/*
-printf("get_ALINEA_rate:\n");
-printf("{occ_in = ML2_occ+ML3_occ/2} occ_in %.1f ML2_occ %.1f ML3_occ %.1f\n",
-   occ_in,
-   pramp_data->mainline_avg_occupancy[1],
-   pramp_data->mainline_avg_occupancy[2]
-   );
-*/
 	q_in = ( pramp_data->mainline_avg_volume[1] + pramp_data->mainline_avg_volume[2] ) * (3600.0/RAMP_DATA_INTERVAL);	//HOV lane excluded
-
 	q_r = ( pramp_data->passage_vol[NUMBER_RAMP_DATA-1][1] +pramp_data->passage_vol[NUMBER_RAMP_DATA-1][2] ) * (3600.0/RAMP_DATA_INTERVAL);	//HOV lane excluded
-/*
-printf("{q_r = (metered2_passage_vol+metered3_passage_vol)*(3600.0/RAMP_DATA_INTERVAL)} q_r %.1f metered2_passage_vol %d %d metered3_passage_vol %d %d\n",
-   q_r,
-   pramp_data->passage_vol[NUMBER_RAMP_DATA-1][1],
-   pramp_data->passage_vol[0][1],
-   pramp_data->passage_vol[NUMBER_RAMP_DATA-1][2],
-   pramp_data->passage_vol[0][2]
-   );
-*/
 
 	if( occ_in < OCC_CRITICAL )
 		occ_out=ALPHA*occ_in*(1+q_r/max(q_in,1e-3))*IN_LANES/OUT_LANES;
@@ -399,30 +374,14 @@ printf("{q_r = (metered2_passage_vol+metered3_passage_vol)*(3600.0/RAMP_DATA_INT
 		occ_out = ALINEA_GAMMA * occ_out_prime + (1-ALINEA_GAMMA) * pramp_data->prev_occ_out; 
 	}
 	current_rate = ( pramp_data->meter_rate[NUMBER_RAMP_DATA-1][1] + pramp_data->meter_rate[NUMBER_RAMP_DATA-1][2] ) / 2.0;
-/*
-printf("{current rate = rate2+rate3/2} current rate %.1f rate2 %.1f rate3 %.1f\n", 
-	current_rate,
-	pramp_data->meter_rate[NUMBER_RAMP_DATA-1][1],
-	pramp_data->meter_rate[NUMBER_RAMP_DATA-1][2]
-	);
-*/
 	new_rate = current_rate+ALINEA_KR*(OCC_CRITICAL-occ_out);
-/*
-printf("{new rate = current rate+ALINEA_KR*(OCC_CRITICAL-occ_out)} new rate %.1f current rate %.1f ALINEA_KR %.1f OCC_CRITICAL %.1f occ_out %.1f\n",
-	new_rate,
-	current_rate,
-	ALINEA_KR,
-	OCC_CRITICAL,
-	occ_out
-	);
-*/
 	if(new_rate<ALINEA_LOWER_BOUND)
 		new_rate=ALINEA_LOWER_BOUND;
 	if(new_rate>ALINEA_UPPER_BOUND)
 		new_rate=ALINEA_UPPER_BOUND;
-/*
-printf("get_ALINEA_rate: new rate after threshold check %.1f\n", new_rate);
-*/
+
+	pramp_data->prev_occ_out = occ_out;
+
 	return new_rate;
 }
 

@@ -8,6 +8,8 @@
 #include <urms.h>
 #include "wrfiles_ac_rm.h"
 #include "variables2.h"
+#include "meter_lib.h"
+#include "ac_rm_algo.h"
 
 char *interval_str[] = {
 "Walk", 

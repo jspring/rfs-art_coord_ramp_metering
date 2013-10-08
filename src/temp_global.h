@@ -1,15 +1,19 @@
+#include "read_data.h"
+
+
 #ifndef		_TEMP_GLOBAL_H_
 #define		_TEMP_GLOBAL_H_
 
+#undef _TEMP_GLOBAL_H_DECLS
 #ifndef _TEMP_GLOBAL_H_DECLS
 #define _DECL extern
 #else
 #define _DECL
 #endif
 
+/*
 _DECL	float hr,min,sec;
-//_DECL	int green_yellow_overlap,presence1,presence2,presence3,presence4,greens,yellows,reds;
-_DECL	int green_yellow_overlap,presence1,presence2,presence3,presence4,yellows,reds;
+_DECL	int green_yellow_overlap,presence1,presence2,presence3,presence4,greens,yellows,reds;
 	//redudant
 _DECL	char c1,c2;
 _DECL	unsigned int a1,a2,a3,a4,a5,a6,a7,a8;
@@ -27,5 +31,6 @@ _DECL	float queue_occ_1;
 _DECL	int demand_vol_0,passage_vol_0,queue_vol_0,b1_0,b2_0,b3_0;
 _DECL	float queue_occ_0;
 _DECL	int rate_0,rate_1,rate_2;
+*/
 
 #endif

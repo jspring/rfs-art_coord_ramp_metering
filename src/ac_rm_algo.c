@@ -12,6 +12,7 @@
 #include "ab3418comm.h"
 #include "max_green_lib.h"
 #include "meter_lib.h"
+#include "wrfiles_ac_rm.h"
 
 #define _VARIABLES_H_DECLS
 
@@ -54,11 +55,12 @@ int db_trig_list_algo[] =  {
 
 int NUM_TRIG_VARS_ALGO = sizeof(db_trig_list_algo)/sizeof(int);
 
-int old_phase6_signal_status;
+//int old_phase6_signal_status;
 
 FILE *meter_fp;
 FILE *signal_fp;
 int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data);
+int set_globals(phase_status_t *phase_status, get_long_status8_resp_mess_typ *status, db_urms_status_t *db_urms_status, urms_datafile_t *urms_datafile);
 
 int main( int argc, char *argv[]) {
 
@@ -73,6 +75,8 @@ int main( int argc, char *argv[]) {
 	db_ramp_data_t db_ramp_data;
 	get_long_status8_resp_mess_typ get_long_status8_resp_mess;
 	get_short_status_resp_t short_status;
+	urms_datafile_t urms_datafile;
+	phase_status_t phase_status;
 
         int ipc_message_error_ctr = 0;
 	unsigned char greenstat = 0;
@@ -83,6 +87,7 @@ int main( int argc, char *argv[]) {
 
 	int interval = 1000;
 	int verbose = 0;
+	int retval = 0;
 
 	//variables for the intersection measurement
 	int new_max_green = 15;
@@ -164,6 +169,9 @@ int main( int argc, char *argv[]) {
 			if(verbose)
 				printf("Got DB_SHORT_STATUS_VAR\n");
                         db_clt_read(pclt, DB_SHORT_STATUS_VAR, sizeof(get_short_status_resp_t), &short_status);
+			db_clt_read(pclt, DB_PHASE_STATUS_VAR, sizeof(phase_status_t), &phase_status);
+			db_clt_read(pclt, DB_URMS_DATAFILE_VAR, sizeof(urms_datafile_t), &urms_datafile);
+
 			greenstat = short_status.greens;
 			if( (greenstat_sav == 0x0) &&
 			    ((greenstat  == 0x44 )) ) 
@@ -205,6 +213,7 @@ printf("ac_rm_algo: new meter rate %f\n", ramp_data.new_meter_rate);
 				}
 			greenstat_sav = greenstat;
 		}
+		retval = set_globals(&phase_status, &get_long_status8_resp_mess, &db_urms_status, &urms_datafile);
 		test(&db_signal_data, &db_ramp_data);
 	}
 	fclose(meter_fp);
@@ -217,6 +226,8 @@ int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data)
 	struct signal_variables *psignal_data = &signal_data;
 	struct ramp_variables *pramp_data = &ramp_data;
 	int flag;
+	int ramp_flag = 0;
+	int signal_flag = 0;
 	typedef unsigned char u8;
 	typedef unsigned short u16;
 
@@ -301,7 +312,7 @@ int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data)
 	signal_flag = get_barrier_flag();
 	if(signal_flag == 1)
 	{
-		old_phase6_signal_status = 0;
+//		old_phase6_signal_status = 0;
 		//get new max green
 		flag=get_intersection_measurement(psignal_data,pramp_data);
 		if(flag==0)
@@ -357,3 +368,64 @@ int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data)
 	return 0;
 }
 
+
+int set_globals(phase_status_t *phase_status, get_long_status8_resp_mess_typ *status, db_urms_status_t *db_urms_status, urms_datafile_t *urms_datafile) {
+
+	hr =  phase_status->ts.hour;
+	sec =  phase_status->ts.sec;
+	min =  phase_status->ts.min;
+  
+	greens = phase_status->greens;
+	yellows = phase_status->yellows;
+	reds = phase_status->reds;
+	green_yellow_overlap = status->green_yellow_overlap;
+	presence1 = status->presence1;
+	presence2 = status->presence2;
+	presence3 = status->presence3;
+	presence4 = status->presence4;
+	
+//	printf("set_globals: greens %#hhx yellows %#hhx reds %#hhx\n", greens, yellows, reds);
+//	printf("set_globals: green_yellow_overlap %#hhx presence1 %#hhx presence2 %#hhx presence3 %#hhx presence4 %#hhx\n", green_yellow_overlap, presence1, presence2, presence3, presence4);
+
+	lead_stat_0 = db_urms_status->mainline_stat[0].lead_stat;
+	lead_vol_0 = db_urms_status->mainline_stat[0].lead_vol;
+	lead_occ_0 = urms_datafile->mainline_lead_occ[0];
+	trail_stat_0 = db_urms_status->mainline_stat[0].trail_stat;
+	trail_vol_0 = db_urms_status->mainline_stat[0].trail_vol;
+	trail_occ_0 = urms_datafile->mainline_trail_occ[0];
+	
+	lead_stat_1 = db_urms_status->mainline_stat[1].lead_stat;
+	lead_vol_1 = db_urms_status->mainline_stat[1].lead_vol;
+	lead_occ_1 = urms_datafile->mainline_lead_occ[1];
+	trail_stat_1 = db_urms_status->mainline_stat[1].trail_stat;
+	trail_vol_1 = db_urms_status->mainline_stat[1].trail_vol;
+	trail_occ_1 = urms_datafile->mainline_trail_occ[1];
+	
+	lead_stat_2 = db_urms_status->mainline_stat[2].lead_stat;
+	lead_vol_2 = db_urms_status->mainline_stat[2].lead_vol;
+	lead_occ_2 = urms_datafile->mainline_lead_occ[2];
+	trail_stat_2 = db_urms_status->mainline_stat[2].trail_stat;
+	trail_vol_2 = db_urms_status->mainline_stat[2].trail_vol;
+	trail_occ_2 = urms_datafile->mainline_trail_occ[2];
+
+	demand_vol_0 = db_urms_status->metered_lane_stat[0].demand_vol;
+	passage_vol_0 = db_urms_status->metered_lane_stat[0].passage_vol;
+	queue_occ_0 = urms_datafile->queue_occ[0];
+	queue_vol_0 = db_urms_status->queue_stat[0].vol;
+	rate_0 = urms_datafile->metering_rate[0];
+
+	demand_vol_1 = db_urms_status->metered_lane_stat[1].demand_vol;
+	passage_vol_1 = db_urms_status->metered_lane_stat[1].passage_vol;
+	queue_occ_1 = urms_datafile->queue_occ[1];
+	queue_vol_1 = db_urms_status->queue_stat[1].vol;
+	rate_1 = urms_datafile->metering_rate[1];
+
+	demand_vol_2 = db_urms_status->metered_lane_stat[2].demand_vol;
+	passage_vol_2 = db_urms_status->metered_lane_stat[2].passage_vol;
+	queue_occ_2 = urms_datafile->queue_occ[2];
+	queue_vol_2 = db_urms_status->queue_stat[2].vol;
+	rate_2 = urms_datafile->metering_rate[2];
+
+	return 0;
+
+}
