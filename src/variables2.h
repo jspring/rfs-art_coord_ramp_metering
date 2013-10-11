@@ -13,12 +13,13 @@ typedef unsigned int bool;
 #define false 0
 
 
-#define MAX_GREEN_UPPERBOUND 25
+#define MAX_GREEN_UPPERBOUND 24
 #define MAX_GREEN_LOWERBOUND 12
 
 #define RAMP_LIMIT 76.0
 #define RAMP_QUEUE_THRESHOLD RAMP_LIMIT/2
 #define RAMP_QUEUE_DELTA 10.0
+#define RAMP_METER_CHANGE_THRESHOLD 0.1
 //
 #define LT_OCC_THRESHOLD 0.15
 //#define RTQUEUE_THRESHOLD 20.0
@@ -53,8 +54,8 @@ typedef unsigned int bool;
 #define NUMBER_METERED_LANE 3	//number of metered lane, including HOV
 #define NUMBER_MAINLINE_LANE 3	//number of mainline lane, including HOV
 #define NUMBER_RAMP_DATA 6 //maximum pieces of ramp data kept
-#define THRESHOLD_OCC_HEALTH 0.1
-#define THRESHOLD_VOL_HEALTH 1.0
+#define THRESHOLD_OCC_HEALTH 0.05
+#define THRESHOLD_VOL_HEALTH 0.1
 #define OCC_CRITICAL 25.0
 #define IN_LANES 2.0
 #define OUT_LANES 3.0
@@ -62,7 +63,7 @@ typedef unsigned int bool;
 #define LEFT_OCC_THRESHOLD_TO_ACTIVATE_INTERSECTION 0.3
 #define RIGHT_OCC_THRESHOLD_TO_ACTIVATE_INTERSECTION 0.3
 #define EPS 1e-3
-#define METHOD_FOR_RAMP_QUEUE 1	//the way to get ramp queue flag, 1: via queue estimation from in/out flow 2: queue detector 2 occupancy 3: left and right turn occupancy
+#define METHOD_FOR_RAMP_QUEUE 3	//the way to get ramp queue flag, 1: via queue estimation from in/out flow 2: queue detector 2 occupancy 3: left and right turn occupancy
 
 #define ALINEA_KR 70.0
 #define SHOCH_WAVE_SPEED -15.0

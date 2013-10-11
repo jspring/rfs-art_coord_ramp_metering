@@ -23,7 +23,7 @@ sleep 1
 
 #echo "Starting ac_rm_algo"
 cd /home/art_coord_ramp_metering/src 
-./lnx/ac_rm_algo &
+./lnx/ac_rm_algo >>ac_rm_algo.out &
 sleep 1
 
 #echo "Starting wrfiles_ac_rm"

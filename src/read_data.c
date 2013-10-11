@@ -54,161 +54,160 @@ int get_new_data(char str[],struct signal_variables *psignal_data,struct ramp_va
 
 bool check_mainline_occ_health_lead(struct ramp_variables* pramp_data,int lane_id)
 {
-	int i = NUMBER_RAMP_DATA-1;
-	int j;
-	int count;
-	bool flag;
+        int i = NUMBER_RAMP_DATA-1;
+        int j;
+        int count;
+        bool flag;
 
-	if(pramp_data->mainline_lead_status[i][lane_id]!=MAINLINE_DETECTOR_WORKING)
-		return false;
+        if(pramp_data->mainline_lead_status[i][lane_id]!=MAINLINE_DETECTOR_WORKING)
+                return false;
 
-	count = 0;
-	flag = false;
-	for(j=1;j<=i;j++)
-	{
-		if( pramp_data->data_time[j]< EPS )
-			continue;
-		if( abs(pramp_data->mainline_lead_occ[j][lane_id]-pramp_data->mainline_lead_occ[j-1][lane_id]) <= THRESHOLD_OCC_HEALTH*pramp_data->mainline_lead_occ[j-1][lane_id] )
-		{
-			count++;
-			if(j==i)
-				flag = true;
-		}
-	}
-	if( count> i/2 && flag )
-		return false;
-	else
-		return true;
+        count = 0;
+        flag = false;
+        for(j=1;j<=i;j++)
+        {
+                if( pramp_data->data_time[j]< EPS )
+                        continue;
+                if( fabs(pramp_data->mainline_lead_occ[j][lane_id]-pramp_data->mainline_lead_occ[j-1][lane_id]) <= THRESHOLD_OCC_HEALTH*pramp_data->mainline_lead_occ[j-1][lane_id] )
+                {
+                        count++;
+                        if(j==i)
+                                flag = true;
+                }
+        }
+        if( count> i/2 && flag )
+                return false;
+        else
+                return true;
 }
 
 bool check_mainline_occ_health_trail(struct ramp_variables* pramp_data,int lane_id)
 {
-	int i = NUMBER_RAMP_DATA-1;
-	int j;
-	int count;
-	bool flag;
+        int i = NUMBER_RAMP_DATA-1;
+        int j;
+        int count;
+        bool flag;
+        float tabs;
 
-	if(pramp_data->mainline_trail_status[i][lane_id]!=MAINLINE_DETECTOR_DISABLE)
-		return false;
+        if(pramp_data->mainline_trail_status[i][lane_id]!=MAINLINE_DETECTOR_DISABLE)
+                return false;
 
-	count = 0;
-	flag = false;
-	for(j=1;j<=i;j++)
-	{
-		if( pramp_data->data_time[j]< EPS )
-			continue;
-		if( abs(pramp_data->mainline_trail_occ[j][lane_id]-pramp_data->mainline_trail_occ[j-1][lane_id])<=THRESHOLD_OCC_HEALTH*pramp_data->mainline_trail_occ[j-1][lane_id] )
-		{
-			count++;
-			if(j==i)
-				flag = true;
-		}
-	}
-	if( count> i/2 && flag )
-		return false;
-	else
-		return true;
+        count = 0;
+        flag = false;
+        for(j=1;j<=i;j++)
+        {
+                if( pramp_data->data_time[j]< EPS )
+                        continue;
+                if( fabs(pramp_data->mainline_trail_occ[j][lane_id]-pramp_data->mainline_trail_occ[j-1][lane_id])<=THRESHOLD_OCC_HEALTH*pramp_data->mainline_trail_occ[j-1][lane_id] )
+                {
+                        tabs=fabs(pramp_data->mainline_trail_occ[j][lane_id]-pramp_data->mainline_trail_occ[j-1][lane_id]);
+                        count++;
+                        if(j==i)
+                                flag = true;
+                }
+        }
+        if( count> i/2 && flag )
+                return false;
+        else
+                return true;
 }
 
 bool check_mainline_vol_health_lead(struct ramp_variables* pramp_data,int lane_id)
 {
-	int i = NUMBER_RAMP_DATA-1;
-	int j;
-	int count;
-	bool flag;
+        int i = NUMBER_RAMP_DATA-1;
+        int j;
+        int count;
+        bool flag;
 
-	if(pramp_data->mainline_lead_status[i][lane_id]!=MAINLINE_DETECTOR_WORKING)
-		return false;
+        if(pramp_data->mainline_lead_status[i][lane_id]!=MAINLINE_DETECTOR_WORKING)
+                return false;
 
-	count = 0;
-	flag = false;
-	for(j=1;j<=i;j++)
-	{
-		if( pramp_data->data_time[j]< EPS )
-			continue;
-		if( abs(pramp_data->mainline_lead_vol[j][lane_id]-pramp_data->mainline_lead_vol[j-1][lane_id])<=THRESHOLD_VOL_HEALTH*pramp_data->mainline_lead_vol[j-1][lane_id] )
-		{
-			count++;
-			if(j==i)
-				flag = true;
-		}
-	}
-	if( count> i/2 && flag )
-		return false;
-	else
-		return true;
+        count = 0;
+        flag = false;
+        for(j=1;j<=i;j++)
+        {
+                if( pramp_data->data_time[j]< EPS )
+                        continue;
+                if( fabs(pramp_data->mainline_lead_vol[j][lane_id]-pramp_data->mainline_lead_vol[j-1][lane_id])<=THRESHOLD_VOL_HEALTH*pramp_data->mainline_lead_vol[j-1][lane_id] )
+                {
+                        count++;
+                        if(j==i)
+                                flag = true;
+                }
+        }
+        if( count> i/2 && flag )
+                return false;
+        else
+                return true;
 }
+
 bool check_mainline_vol_health_trail(struct ramp_variables* pramp_data,int lane_id)
 {
-	int i = NUMBER_RAMP_DATA-1;
-	int j;
-	int count;
-	bool flag;
+        int i = NUMBER_RAMP_DATA-1;
+        int j;
+        int count;
+        bool flag;
 
-	if(pramp_data->mainline_trail_status[i][lane_id]!=MAINLINE_DETECTOR_DISABLE)
-		return false;
+        if(pramp_data->mainline_trail_status[i][lane_id]!=MAINLINE_DETECTOR_DISABLE)
+                return false;
 
-	count = 0;
-	flag = false;
-	for(j=1;j<=i;j++)
-	{
-		if( pramp_data->data_time[j]< EPS )
-			continue;
-		if( abs(pramp_data->mainline_trail_vol[j][lane_id]-pramp_data->mainline_trail_vol[j-1][lane_id])<=THRESHOLD_VOL_HEALTH*pramp_data->mainline_trail_vol[j-1][lane_id] )
-		{
-			count++;
-			if(j==i)
-				flag = true;
-		}
-	}
-	if( count> i/2 && flag )
-		return false;
-	else
-		return true;
+        count = 0;
+        flag = false;
+        for(j=1;j<=i;j++)
+        {
+                if( pramp_data->data_time[j]< EPS )
+                        continue;
+                if( fabs(pramp_data->mainline_trail_vol[j][lane_id]-pramp_data->mainline_trail_vol[j-1][lane_id])<=THRESHOLD_VOL_HEALTH*pramp_data->mainline_trail_vol[j-1][lane_id] )
+                {
+                        count++;
+                        if(j==i)
+                                flag = true;
+                }
+        }
+        if( count> i/2 && flag )
+                return false;
+        else
+                return true;
 }
 
 
 float get_mainline_average_occupancy(struct ramp_variables* pramp_data)
 {
-	int i = NUMBER_RAMP_DATA-1;
-	int lane_id;
-	int lead_health,trail_health;
-	for(lane_id=0;lane_id<NUMBER_MAINLINE_LANE-1;lane_id++)
-	{
-		lead_health = check_mainline_occ_health_lead(pramp_data, lane_id);
-		trail_health = check_mainline_occ_health_trail(pramp_data,lane_id);
-		if ( lead_health && trail_health )
-			pramp_data->mainline_avg_occupancy[lane_id] = 0.5*(pramp_data->mainline_lead_occ[i][lane_id]+pramp_data->mainline_trail_occ[i][lane_id]);
-		else if (lead_health)
-			pramp_data->mainline_avg_occupancy[lane_id] = pramp_data->mainline_lead_occ[i][lane_id];
-		else if (trail_health)
-			pramp_data->mainline_avg_occupancy[lane_id] = pramp_data->mainline_trail_occ[i][lane_id];
-	}
-	return 0;
+        int i = NUMBER_RAMP_DATA-1;
+        int lane_id;
+        int lead_health,trail_health;
+        for(lane_id=0;lane_id<NUMBER_MAINLINE_LANE;lane_id++)
+        {
+                lead_health = check_mainline_occ_health_lead(pramp_data, lane_id);
+                trail_health = check_mainline_occ_health_trail(pramp_data,lane_id);
+                if ( lead_health && trail_health )
+                        pramp_data->mainline_avg_occupancy[lane_id] = 0.5*(pramp_data->mainline_lead_occ[i][lane_id]+pramp_data->mainline_trail_occ[i][lane_id]);
+                else if (lead_health)
+                        pramp_data->mainline_avg_occupancy[lane_id] = pramp_data->mainline_lead_occ[i][lane_id];
+                else if (trail_health)
+                        pramp_data->mainline_avg_occupancy[lane_id] = pramp_data->mainline_trail_occ[i][lane_id];
+        }
+        return 0;
 }
 
 float get_mainline_average_volume(struct ramp_variables* pramp_data)
 {
-	int i = NUMBER_RAMP_DATA-1;
-	int lane_id;
-	int lead_health,trail_health;
-	for(lane_id=0;lane_id<NUMBER_MAINLINE_LANE-1;lane_id++)
-	{
-		lead_health = check_mainline_vol_health_lead(pramp_data, lane_id);
-		trail_health = check_mainline_vol_health_trail(pramp_data,lane_id);
-		if ( lead_health && trail_health )
-			pramp_data->mainline_avg_volume[lane_id] = (int) (0.5*(pramp_data->mainline_lead_vol[i][lane_id]+pramp_data->mainline_trail_vol[i][lane_id]));
-		else if (lead_health)
-			pramp_data->mainline_avg_volume[lane_id] = pramp_data->mainline_lead_vol[i][lane_id];
-		else if (trail_health)
-			pramp_data->mainline_avg_volume[lane_id] = pramp_data->mainline_trail_vol[i][lane_id];
-	}
-	return 0;
+        int i = NUMBER_RAMP_DATA-1;
+        int lane_id;
+        int lead_health,trail_health;
+        for(lane_id=0;lane_id<NUMBER_MAINLINE_LANE;lane_id++)
+        {
+                lead_health = check_mainline_vol_health_lead(pramp_data, lane_id);
+                trail_health = check_mainline_vol_health_trail(pramp_data,lane_id);
+                if ( lead_health && trail_health )
+                        pramp_data->mainline_avg_volume[lane_id] = (int) (0.5*(pramp_data->mainline_lead_vol[i][lane_id]+pramp_data->mainline_trail_vol[i][lane_id]));
+                else if (lead_health)
+                        pramp_data->mainline_avg_volume[lane_id] = pramp_data->mainline_lead_vol[i][lane_id];
+                else if (trail_health)
+                        pramp_data->mainline_avg_volume[lane_id] = pramp_data->mainline_trail_vol[i][lane_id];
+        }
+        return 0;
 }
-
-
-
-
 
 int move_ramp_data_forward(struct ramp_variables* pramp_data)
 {

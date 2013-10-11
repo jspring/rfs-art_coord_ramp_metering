@@ -55,11 +55,9 @@ int db_trig_list_algo[] =  {
 
 int NUM_TRIG_VARS_ALGO = sizeof(db_trig_list_algo)/sizeof(int);
 
-//int old_phase6_signal_status;
-
 FILE *meter_fp;
 FILE *signal_fp;
-int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data);
+int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data, unsigned char signal_flag, unsigned char ramp_flag);
 int set_globals(phase_status_t *phase_status, get_long_status8_resp_mess_typ *status, db_urms_status_t *db_urms_status, urms_datafile_t *urms_datafile);
 
 int main( int argc, char *argv[]) {
@@ -84,13 +82,20 @@ int main( int argc, char *argv[]) {
 	phase_timing_t phase_timing;
 	struct timespec start_time;
 	struct timespec end_time;
+	struct timespec call_test;
+	struct timespec call_test_sav;
+	unsigned char ramp_flag = 0;
+	unsigned char ramp_flag_sav = 0;
+	unsigned char signal_flag = 0;
+	unsigned char signal_flag_sav = 0;
+	double timediff = 0;
 
 	int interval = 1000;
 	int verbose = 0;
 	int retval = 0;
 
 	//variables for the intersection measurement
-	int new_max_green = 15;
+//	int new_max_green = 15;
 	int option;
 
 	int flag2;
@@ -147,6 +152,7 @@ int main( int argc, char *argv[]) {
 		phase_timing.max_green1,
 		phase_timing.min_green + phase_timing.max_green1
 	);
+	clock_gettime(CLOCK_REALTIME, &call_test_sav);
 	
 	while(1) {	
 		clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
@@ -197,37 +203,103 @@ int main( int argc, char *argv[]) {
 				db_clt_write(pclt, DB_URMS_VAR, sizeof(db_urms_t), &db_urms);
 printf("ac_rm_algo: new meter rate %f\n", ramp_data.new_meter_rate);
 
-				new_max_green = signal_data.new_max_green;
+//				new_max_green = signal_data.new_max_green;
 #define PHASE_3			3
 #define YELLOW_NO_CHANGE	0
 #define ALL_RED_NO_CHANGE	0
 #define MIN_GREEN_NO_CHANGE	0
-				flag2 = db_set_min_max_green(pclt, PHASE_3, MIN_GREEN_NO_CHANGE, new_max_green, YELLOW_NO_CHANGE, ALL_RED_NO_CHANGE, verbose);
-				if(flag2) {
-					fprintf(stderr, "db_set_min_max_green failed. Exiting....\n");	
-					return -1;
-				}
-				phase_timing.max_green1 = new_max_green;
-				db_clt_write(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
+//				flag2 = db_set_min_max_green(pclt, PHASE_3, MIN_GREEN_NO_CHANGE, new_max_green, YELLOW_NO_CHANGE, ALL_RED_NO_CHANGE, verbose);
+//				if(flag2) {
+//					fprintf(stderr, "db_set_min_max_green failed. Exiting....\n");	
+//					return -1;
+//				}
+//				phase_timing.max_green1 = new_max_green;
+//				db_clt_write(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
 
 				}
 			greenstat_sav = greenstat;
 		}
 		retval = set_globals(&phase_status, &get_long_status8_resp_mess, &db_urms_status, &urms_datafile);
-		test(&db_signal_data, &db_ramp_data);
+		clock_gettime(CLOCK_REALTIME, &call_test);
+		timediff = (call_test.tv_sec + (call_test.tv_nsec/1.0e9)) - (call_test_sav.tv_sec + (call_test_sav.tv_nsec/1.0e9));
+		if(timediff >= 0.05) {
+			read_real_time_data(&signal_data);
+	db_signal_data.LT_occ = signal_data.LT_occ;
+	db_signal_data.old_LT_occ = signal_data.old_LT_occ;
+	db_signal_data.RT_occ = signal_data.RT_occ;
+	db_signal_data.ramp_queue = signal_data.ramp_queue;
+	db_signal_data.old_ramp_queue = signal_data.old_ramp_queue;
+	db_signal_data.RT_exceed_num = signal_data.RT_exceed_num;
+	db_signal_data.new_max_green = signal_data.new_max_green;
+	db_signal_data.old_max_green = signal_data.old_max_green;
+	db_signal_data.last_sent_max_green = signal_data.last_sent_max_green;
+	db_signal_data.data_row = signal_data.data_row;
+	db_signal_data.regular_remain_cycle = signal_data.regular_remain_cycle;
+	db_signal_data.overwrite_remain_cycle = signal_data.overwrite_remain_cycle;
+	db_signal_data.cycle_passed = signal_data.cycle_passed;
+	db_signal_data.prev_cycle_terminate_time = signal_data.prev_cycle_terminate_time;
+	db_signal_data.current_cycle_terminate_time = signal_data.current_cycle_terminate_time;
+	db_signal_data.prev_queue_reset_time = signal_data.prev_queue_reset_time;
+	db_signal_data.regular_release = signal_data.regular_release;
+	db_signal_data.overwrite_release = signal_data.overwrite_release;
+        db_signal_data.realtime_data[PHASE5SIGNAL] = signal_data.realtime_data[signal_data.data_row][PHASE5SIGNAL];
+        db_signal_data.realtime_data[PHASE5APPROACH1] = signal_data.realtime_data[signal_data.data_row][PHASE5APPROACH1];
+        db_signal_data.realtime_data[PHASE5APPROACH2] = signal_data.realtime_data[signal_data.data_row][PHASE5APPROACH2];
+        db_signal_data.realtime_data[PHASE5STOPBAR] = signal_data.realtime_data[signal_data.data_row][PHASE5STOPBAR];
+        db_signal_data.realtime_data[PHASE8SIGNAL] = signal_data.realtime_data[signal_data.data_row][PHASE8SIGNAL];
+        db_signal_data.realtime_data[PHASE8APPROACH] = signal_data.realtime_data[signal_data.data_row][PHASE8APPROACH];
+        db_signal_data.realtime_data[PHASE8STOPBAR] = signal_data.realtime_data[signal_data.data_row][PHASE8STOPBAR];
+        db_signal_data.realtime_data[PHASE6SIGNAL] = signal_data.realtime_data[signal_data.data_row][PHASE6SIGNAL];
+        db_signal_data.realtime_data[PHASE7SIGNAL] = signal_data.realtime_data[signal_data.data_row][PHASE7SIGNAL];
+        db_signal_data.realtime_data[PHASE3SIGNAL] = signal_data.realtime_data[signal_data.data_row][PHASE3SIGNAL];
+	db_clt_write(pclt, DB_SIGNAL_DATA_VAR, sizeof(db_signal_data_t), &db_signal_data);
+			signal_flag = get_barrier_flag();
+			if((signal_flag != 0) && (signal_flag_sav == 0)) {
+				signal_flag = 1;
+				signal_flag_sav = 1;
+				printf("Got signal flag!!!!!!\n");
+			}
+			else {
+				if((signal_flag != 0) && (signal_flag_sav != 0)) {
+					signal_flag = 0;
+				}
+				else {
+					signal_flag = 0;
+					signal_flag_sav = 0;
+				}
+			}
+
+			ramp_flag = get_ramp_flag();
+			if((ramp_flag != 0) && (ramp_flag_sav == 0)) {
+				ramp_flag = 1;
+				ramp_flag_sav = 1;
+				printf("Got ramp flag!!!!!!\n");
+			}
+			else {
+				if((ramp_flag != 0) && (ramp_flag_sav != 0)) {
+					ramp_flag = 0;
+				}
+				else {
+					ramp_flag = 0;
+					ramp_flag_sav = 0;
+				}
+			}
+			call_test_sav.tv_sec = call_test.tv_sec;
+			call_test_sav.tv_nsec = call_test.tv_nsec;
+			if( (ramp_flag != 0) || (signal_flag != 0) )
+				test(&db_signal_data, &db_ramp_data, signal_flag, ramp_flag);
+		}
 	}
 	fclose(meter_fp);
 	fclose(signal_fp);
 	return 0;
 }
 
-int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data)
+int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data, unsigned char signal_flag, unsigned char ramp_flag)
 {
 	struct signal_variables *psignal_data = &signal_data;
 	struct ramp_variables *pramp_data = &ramp_data;
 	int flag;
-	int ramp_flag = 0;
-	int signal_flag = 0;
 	typedef unsigned char u8;
 	typedef unsigned short u16;
 
@@ -301,18 +373,13 @@ int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data)
 			db_clt_write(pclt, DB_RAMP_DATA_VAR, sizeof(db_ramp_data_t), db_ramp_data);
 
 			//Must wait until known good data before checking flag and doing rate calculation
-			ramp_flag = get_ramp_flag();
 			if( ramp_flag == 1 )
 			{
 				pramp_data->new_meter_rate = get_ALINEA_rate(pramp_data);
 			}
-			ramp_flag = 0;
 	}
-	read_real_time_data(psignal_data);
-	signal_flag = get_barrier_flag();
 	if(signal_flag == 1)
 	{
-//		old_phase6_signal_status = 0;
 		//get new max green
 		flag=get_intersection_measurement(psignal_data,pramp_data);
 		if(flag==0)
@@ -327,38 +394,7 @@ int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data)
 			}
 		}
 		psignal_data->data_row=-1;
-		signal_flag = 0;
 	}
-
-	db_signal_data->LT_occ = psignal_data->LT_occ;
-	db_signal_data->old_LT_occ = psignal_data->old_LT_occ;
-	db_signal_data->RT_occ = psignal_data->RT_occ;
-	db_signal_data->ramp_queue = psignal_data->ramp_queue;
-	db_signal_data->old_ramp_queue = psignal_data->old_ramp_queue;
-	db_signal_data->RT_exceed_num = psignal_data->RT_exceed_num;
-	db_signal_data->new_max_green = psignal_data->new_max_green;
-	db_signal_data->old_max_green = psignal_data->old_max_green;
-	db_signal_data->last_sent_max_green = psignal_data->last_sent_max_green;
-	db_signal_data->data_row = psignal_data->data_row;
-	db_signal_data->regular_remain_cycle = psignal_data->regular_remain_cycle;
-	db_signal_data->overwrite_remain_cycle = psignal_data->overwrite_remain_cycle;
-	db_signal_data->cycle_passed = psignal_data->cycle_passed;
-	db_signal_data->prev_cycle_terminate_time = psignal_data->prev_cycle_terminate_time;
-	db_signal_data->current_cycle_terminate_time = psignal_data->current_cycle_terminate_time;
-	db_signal_data->prev_queue_reset_time = psignal_data->prev_queue_reset_time;
-	db_signal_data->regular_release = psignal_data->regular_release;
-	db_signal_data->overwrite_release = psignal_data->overwrite_release;
-        db_signal_data->realtime_data[PHASE5SIGNAL] = psignal_data->realtime_data[psignal_data->data_row][PHASE5SIGNAL];
-        db_signal_data->realtime_data[PHASE5APPROACH1] = psignal_data->realtime_data[psignal_data->data_row][PHASE5APPROACH1];
-        db_signal_data->realtime_data[PHASE5APPROACH2] = psignal_data->realtime_data[psignal_data->data_row][PHASE5APPROACH2];
-        db_signal_data->realtime_data[PHASE5STOPBAR] = psignal_data->realtime_data[psignal_data->data_row][PHASE5STOPBAR];
-        db_signal_data->realtime_data[PHASE8SIGNAL] = psignal_data->realtime_data[psignal_data->data_row][PHASE8SIGNAL];
-        db_signal_data->realtime_data[PHASE8APPROACH] = psignal_data->realtime_data[psignal_data->data_row][PHASE8APPROACH];
-        db_signal_data->realtime_data[PHASE8STOPBAR] = psignal_data->realtime_data[psignal_data->data_row][PHASE8STOPBAR];
-        db_signal_data->realtime_data[PHASE6SIGNAL] = psignal_data->realtime_data[psignal_data->data_row][PHASE6SIGNAL];
-        db_signal_data->realtime_data[PHASE7SIGNAL] = psignal_data->realtime_data[psignal_data->data_row][PHASE7SIGNAL];
-        db_signal_data->realtime_data[PHASE3SIGNAL] = psignal_data->realtime_data[psignal_data->data_row][PHASE3SIGNAL];
-	db_clt_write(pclt, DB_SIGNAL_DATA_VAR, sizeof(db_signal_data_t), db_signal_data);
 
 	if(QUEUE_RESET &&  get_current_time() - psignal_data->prev_queue_reset_time >=QUEUE_RESET_INTERVAL && METHOD_FOR_RAMP_QUEUE==1)
 	{
