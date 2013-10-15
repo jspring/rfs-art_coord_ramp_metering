@@ -6,6 +6,10 @@ pid=`ps -elf | grep -v grep | grep '/bin/bash /home/art_coord_ramp_metering/syst
 kill $pid
 sleep 1
 
+echo "Stopping ac_rm_algo"
+killall ac_rm_algo
+sleep 1
+
 echo "Stopping urms"
 killall urms
 sleep 1
@@ -32,9 +36,19 @@ echo "Starting urms"
 /home/atsc/urms/lnx/urms -r 10.0.1.126 -i 100 &
 sleep 1
 
-echo "Starting send_urms"
-/home/art_coord_ramp_metering/system/send_urms_data_go.sh $1 &
-sleep 1
+if [[ $1 != "sj" ]]
+then
+	echo "Starting send_urms"
+	/home/art_coord_ramp_metering/system/send_urms_data_go.sh $1 &
+	sleep 1
+fi
+
+if [[ $1 == "sj" ]]
+then
+	echo "Starting ac_rm_algo"
+	/home/art_coord_ramp_metering/src/lnx/ac_rm_algo &
+	sleep 1
+fi
 
 #echo "Starting wrfiles_ac_rm"
 if [[ $1 == "home" ]]

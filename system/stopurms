@@ -10,6 +10,10 @@ pid=`ps -elf | grep -v grep | grep '/bin/bash /home/art_coord_ramp_metering/syst
 kill $pid
 sleep 1
 
+echo "Stopping ac_rm_algo"
+killall ac_rm_algo
+sleep 1
+
 echo "Stopping urms"
 killall urms
 sleep 1
