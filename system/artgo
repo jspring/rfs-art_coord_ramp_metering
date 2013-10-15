@@ -13,8 +13,12 @@ echo "Starting clt_vars"
 sleep 1
 
 echo "Starting ab3418comm"
-/home/atsc/ab3418/lnx/ab3418comm -u >>/big/data/ac_rm_1/ab3418comm.out 2 >>/big/data/ac_rm_1/ab3418comm.err &
-#/home/atsc/ab3418/lnx/ab3418comm -u -p /dev/ttyUSB0 >>/big/data/ac_rm_1/ab3418comm.out 2>>/big/data/ac_rm_1/ab3418comm.err &
+if [[ $1 == "home" ]]
+then
+	/home/atsc/ab3418/lnx/ab3418comm -u -p /dev/ttyUSB0 >>/big/data/ac_rm_1/ab3418comm.out 2>>/big/data/ac_rm_1/ab3418comm.err &
+else
+	/home/atsc/ab3418/lnx/ab3418comm -u >>/big/data/ac_rm_1/ab3418comm.out 2 >>/big/data/ac_rm_1/ab3418comm.err &
+fi
 sleep 5
 
 echo "Starting receive_urms_data_go.sh"
@@ -27,5 +31,9 @@ cd /home/art_coord_ramp_metering/src
 sleep 1
 
 #echo "Starting wrfiles_ac_rm"
-/home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -d /big/data/ac_rm_1 -m 15 &
-#/home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -o
+if [[ $1 == "home" ]]
+then
+	/home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -o
+else
+	/home/art_coord_ramp_metering/src/lnx/wrfiles_ac_rm -d /big/data/ac_rm_1 -m 15 &
+fi
