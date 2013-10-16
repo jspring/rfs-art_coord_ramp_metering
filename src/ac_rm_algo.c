@@ -331,8 +331,8 @@ int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data, unsigne
 				pramp_data->mainline_lead_occ[NUMBER_RAMP_DATA-1][2],
 				pramp_data->new_meter_rate,
 				(int)count);
-printf("lead_occ_0 %.1f lead_occ_1 %.1f lead_occ_2 %.1f\n", lead_occ_0, lead_occ_1, lead_occ_2); 
-fflush(NULL);
+//			printf("lead_occ_0 %.1f lead_occ_1 %.1f lead_occ_2 %.1f\n", lead_occ_0, lead_occ_1, lead_occ_2); 
+			fflush(NULL);
 			db_ramp_data->mainline_trail_occ[0] = pramp_data->mainline_trail_occ[NUMBER_RAMP_DATA-1][0];
 			db_ramp_data->mainline_trail_occ[1] = pramp_data->mainline_trail_occ[NUMBER_RAMP_DATA-1][1];
 			db_ramp_data->mainline_trail_occ[2] = pramp_data->mainline_trail_occ[NUMBER_RAMP_DATA-1][2];
