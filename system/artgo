@@ -27,7 +27,7 @@ sleep 1
 
 #echo "Starting ac_rm_algo"
 cd /home/art_coord_ramp_metering/src 
-./lnx/ac_rm_algo >>ac_rm_algo.out &
+./lnx/ac_rm_algo >>/big/data/ac_rm_1/ac_rm_algo.err &
 sleep 1
 
 #echo "Starting wrfiles_ac_rm"
