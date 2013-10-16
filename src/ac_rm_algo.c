@@ -177,12 +177,12 @@ int main( int argc, char *argv[]) {
 //			printf("ml_lead_occ_1 %f db_urms_status mainline 1 calc occ %f\n", get_occ_main_lead_1(), (float)(((db_urms_status.mainline_stat[0].lead_occ_msb << 8) + (unsigned char)(db_urms_status.mainline_stat[0].lead_occ_lsb)) / 10.0));
 		}
 
-                if( DB_TRIG_VAR(&trig_info) == DB_SHORT_STATUS_VAR ) {
-			if(verbose)
-				printf("Got DB_SHORT_STATUS_VAR\n");
                         db_clt_read(pclt, DB_SHORT_STATUS_VAR, sizeof(get_short_status_resp_t), &short_status);
 			db_clt_read(pclt, DB_PHASE_STATUS_VAR, sizeof(phase_status_t), &phase_status);
 			db_clt_read(pclt, DB_URMS_DATAFILE_VAR, sizeof(urms_datafile_t), &urms_datafile);
+                if( DB_TRIG_VAR(&trig_info) == DB_SHORT_STATUS_VAR ) {
+			if(verbose)
+				printf("Got DB_SHORT_STATUS_VAR\n");
 
 			greenstat = short_status.greens;
 			if( (greenstat_sav == 0x0) &&
@@ -331,6 +331,8 @@ int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data, unsigne
 				pramp_data->mainline_lead_occ[NUMBER_RAMP_DATA-1][2],
 				pramp_data->new_meter_rate,
 				(int)count);
+printf("lead_occ_0 %.1f lead_occ_1 %.1f lead_occ_2 %.1f\n", lead_occ_0, lead_occ_1, lead_occ_2); 
+fflush(NULL);
 			db_ramp_data->mainline_trail_occ[0] = pramp_data->mainline_trail_occ[NUMBER_RAMP_DATA-1][0];
 			db_ramp_data->mainline_trail_occ[1] = pramp_data->mainline_trail_occ[NUMBER_RAMP_DATA-1][1];
 			db_ramp_data->mainline_trail_occ[2] = pramp_data->mainline_trail_occ[NUMBER_RAMP_DATA-1][2];
@@ -435,6 +437,9 @@ int set_globals(phase_status_t *phase_status, get_long_status8_resp_mess_typ *st
 	
 //	printf("set_globals: greens %#hhx yellows %#hhx reds %#hhx\n", greens, yellows, reds);
 //	printf("set_globals: green_yellow_overlap %#hhx presence1 %#hhx presence2 %#hhx presence3 %#hhx presence4 %#hhx\n", green_yellow_overlap, presence1, presence2, presence3, presence4);
+//      printf("set_globals: urms_datafile->mainline_lead_occ[1] %.1f urms_datafile->mainline_lead_occ[2] %.1f\n", urms_datafile->mainline_lead_occ[1], urms_datafile->mainline_lead_occ[2]);
+//      fflush(NULL);
+
 
 	lead_stat_0 = db_urms_status->mainline_stat[0].lead_stat;
 	lead_vol_0 = db_urms_status->mainline_stat[0].lead_vol;
