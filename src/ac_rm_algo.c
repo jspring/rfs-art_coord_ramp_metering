@@ -320,6 +320,12 @@ int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data, unsigne
 	//get new meter rate
 	if(flag==0)
 	{
+			//Must wait until known good data before checking flag and doing rate calculation
+			if( ramp_flag == 1 )
+			{
+				pramp_data->new_meter_rate = get_ALINEA_rate(pramp_data);
+			}
+
 			db_ramp_data->mainline_lead_occ[0] = pramp_data->mainline_lead_occ[NUMBER_RAMP_DATA-1][0];
 			db_ramp_data->mainline_lead_occ[1] = pramp_data->mainline_lead_occ[NUMBER_RAMP_DATA-1][1];
 			db_ramp_data->mainline_lead_occ[2] = pramp_data->mainline_lead_occ[NUMBER_RAMP_DATA-1][2];
@@ -386,12 +392,6 @@ int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data, unsigne
 			db_ramp_data->queue_vol[1] = (u8)pramp_data->queue_vol[NUMBER_RAMP_DATA-1][1];
 			db_ramp_data->queue_vol[2] = (u8)pramp_data->queue_vol[NUMBER_RAMP_DATA-1][2];
 			db_clt_write(pclt, DB_RAMP_DATA_VAR, sizeof(db_ramp_data_t), db_ramp_data);
-
-			//Must wait until known good data before checking flag and doing rate calculation
-			if( ramp_flag == 1 )
-			{
-				pramp_data->new_meter_rate = get_ALINEA_rate(pramp_data);
-			}
 	}
 	if(signal_flag == 1)
 	{
