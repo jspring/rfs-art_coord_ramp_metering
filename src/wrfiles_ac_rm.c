@@ -200,18 +200,6 @@ int main(int argc, char *argv[])
                                 db_vars_ac_rm[i].var_pointer);
 		}
 
-		if(use_stdout) {
-			save_to_spec(stdout, timestamp, 0,
-                                pbuff_ac_rm, num_file_columns,
-                                &file_spec[0]);
-		}
-		else {
-			save_to_spec(f_ac_rm, timestamp, 0,
-                                pbuff_ac_rm, num_file_columns,
-                                &file_spec[0]);
-		}
-		fflush(NULL);
-
 		/** Check if time to close and reopen data logs */
 		if(use_stdout == 0) {
                		if (reopen_data_log_infix(&first_file, file_time, first_file_str,
@@ -224,6 +212,19 @@ int main(int argc, char *argv[])
                                         id_string, ".dat", pbuff_ac_rm);
 			}
 		}
+
+		if(use_stdout) {
+			save_to_spec(stdout, timestamp, 0,
+                                pbuff_ac_rm, num_file_columns,
+                                &file_spec[0]);
+		}
+		else {
+			save_to_spec(f_ac_rm, timestamp, 0,
+                                pbuff_ac_rm, num_file_columns,
+                                &file_spec[0]);
+		}
+		fflush(NULL);
+
 		TIMER_WAIT(ptimer);
 	}
 }
