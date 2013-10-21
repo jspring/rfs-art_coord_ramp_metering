@@ -359,17 +359,18 @@ int get_new_max_green_phase3(struct signal_variables* psignal_data,struct ramp_v
 
 float get_ALINEA_rate(struct ramp_variables* pramp_data)
 {
-        float temp;
-	float q_r;
-	float q_in;
-	float occ_out,occ_out_prime;
-	float current_rate;
-	float new_rate;
-	float occ_in = (pramp_data->mainline_avg_occupancy[1] + pramp_data->mainline_avg_occupancy[2])/2.0;
-	q_in = ( pramp_data->mainline_avg_volume[1] + pramp_data->mainline_avg_volume[2] ) * (3600.0/RAMP_DATA_INTERVAL);	//HOV lane excluded
-	q_r = ( pramp_data->passage_vol[NUMBER_RAMP_DATA-1][1] +pramp_data->passage_vol[NUMBER_RAMP_DATA-1][2] ) * (3600.0/RAMP_DATA_INTERVAL);	//HOV lane excluded
+        float temp,temp2;
+        float q_r;
+        float q_in;
+        float occ_out,occ_out_prime;
+        float current_rate;
+        float new_rate;
+        float occ_in = (pramp_data->mainline_avg_occupancy[1] + pramp_data->mainline_avg_occupancy[2])/2.0;
+        q_in = ( pramp_data->mainline_avg_volume[1] + pramp_data->mainline_avg_volume[2] ) * (3600.0/RAMP_DATA_INTERVAL);       //HOV lane excluded
+        q_r = ( pramp_data->passage_vol[NUMBER_RAMP_DATA-1][1] +pramp_data->passage_vol[NUMBER_RAMP_DATA-1][2] ) * (3600.0/RAMP_DATA_INTERVAL); //HOV lane excluded
 
-	if( occ_in < OCC_CRITICAL ) {
+        if( occ_in < OCC_CRITICAL )
+        {
                 temp=(1.0f+q_r/max(q_in,1e-3));
                 temp=temp*IN_LANES;
                 temp=temp/OUT_LANES;
@@ -377,28 +378,36 @@ float get_ALINEA_rate(struct ramp_variables* pramp_data)
                 temp=ALPHA*temp;
 //              occ_out=ALPHA*occ_in*(1+q_r/max(q_in,1e-3))*IN_LANES/OUT_LANES;
                 occ_out=temp;
-	}
-	else
-	{
-		occ_out_prime = occ_in * IN_LANES/OUT_LANES + 100 * VEHICLE_EFFECTIVE_LENGTH * q_r / SHOCH_WAVE_SPEED / OUT_LANES ;
-		occ_out = ALINEA_GAMMA * occ_out_prime + (1-ALINEA_GAMMA) * pramp_data->prev_occ_out; 
-	}
-	current_rate = ( pramp_data->meter_rate[NUMBER_RAMP_DATA-1][1] + pramp_data->meter_rate[NUMBER_RAMP_DATA-1][2] ) / 2.0;
-	new_rate = current_rate+ALINEA_KR*(OCC_CRITICAL-occ_out);
-
-	if( new_rate > current_rate *(1.0+RAMP_METER_CHANGE_THRESHOLD) )
+        }
+        else
+        {
+                temp = occ_in * IN_LANES;
+                temp = temp/OUT_LANES;
+                temp2 = VEHICLE_EFFECTIVE_LENGTH;
+                temp2 = temp2* q_r;
+                temp2 = temp2/ SHOCH_WAVE_SPEED;
+                temp2 = temp2/ OUT_LANES;
+                occ_out_prime = temp+temp2;
+//              occ_out_prime = occ_in * IN_LANES/OUT_LANES + 100 * VEHICLE_EFFECTIVE_LENGTH * q_r / SHOCH_WAVE_SPEED / OUT_LANES ;
+                occ_out = ALINEA_GAMMA * occ_out_prime + (1-ALINEA_GAMMA) * pramp_data->prev_occ_out;
+printf("get_ALINEA: occ_in %f q_in %f q_r %f temp %f temp2 %f\n", occ_in, q_in, q_r, temp,temp2);
+        }
+        current_rate = ( pramp_data->meter_rate[NUMBER_RAMP_DATA-1][1] + pramp_data->meter_rate[NUMBER_RAMP_DATA-1][2] ) / 2.0;
+        new_rate = current_rate+ALINEA_KR*(OCC_CRITICAL-occ_out);
+/*
+        if( new_rate > current_rate *(1.0+RAMP_METER_CHANGE_THRESHOLD) )
                 new_rate = current_rate *(1.0+RAMP_METER_CHANGE_THRESHOLD);
         if( new_rate < current_rate *(1.0-RAMP_METER_CHANGE_THRESHOLD) )
                 new_rate = current_rate *(1.0-RAMP_METER_CHANGE_THRESHOLD);
-
+*/
         if(new_rate<ALINEA_LOWER_BOUND)
                 new_rate=ALINEA_LOWER_BOUND;
         if(new_rate>ALINEA_UPPER_BOUND)
                 new_rate=ALINEA_UPPER_BOUND;
 
-	pramp_data->prev_occ_out = occ_out;
+        pramp_data->prev_occ_out = occ_out;
 
-	return new_rate;
+        return new_rate;
 }
 
 int reset_ramp_queue(struct signal_variables* psignal_data)
