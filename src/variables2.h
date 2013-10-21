@@ -12,7 +12,7 @@ typedef unsigned int bool;
 #define true 1
 #define false 0
 
-#define USE_CONFIG_FILE
+#undef USE_CONFIG_FILE
 #ifndef USE_CONFIG_FILE 
 
 //intersection parameters
