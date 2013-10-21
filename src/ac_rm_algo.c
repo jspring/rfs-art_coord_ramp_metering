@@ -13,8 +13,11 @@
 #include "max_green_lib.h"
 #include "meter_lib.h"
 #include "wrfiles_ac_rm.h"
+#include "sys_ini.h"
 
 #define _VARIABLES_H_DECLS
+
+static jmp_buf exit_env;
 
 #include "variables2.h"
 #include "variables.h"
@@ -25,10 +28,6 @@
 #include "control_compute.h"
 
 long int count = 0;
-
-static jmp_buf exit_env;
-
-#define NUM_PHASES	8
 
 static void sig_hand( int code )
 {
@@ -95,17 +94,25 @@ int main( int argc, char *argv[]) {
 	int verbose = 0;
 	int retval = 0;
 
-	//variables for the intersection measurement
-//	int new_max_green = 15;
 	int option;
+
+#ifdef USE_CONFIG_FILE
+	FILE *configfileptr = NULL;
+	char *configfilename = NULL;
+#endif
 
 	int flag2;
 
         /* Read and interpret any user switches. */
-        while ((option = getopt(argc, argv, "v")) != EOF) {
+        while ((option = getopt(argc, argv, "vf:")) != EOF) {
                 switch(option) {
                 case 'v':
                         verbose = 1;
+                        break;
+                case 'f':
+#ifdef USE_CONFIG_FILE
+                        configfilename = strdup(optarg);
+#endif
                         break;
                 default:
                         printf("Usage: %s\n", argv[0]);
@@ -134,6 +141,58 @@ int main( int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+#ifdef USE_CONFIG_FILE
+        /**********************************/
+        /*                                */
+        /*          Read from             */
+        /*     parameters_tuning.cfg      */
+        /*                                */
+        /**********************************/
+
+        /* Read from params section */
+        if ((configfileptr = get_ini_section(configfilename, "params")) == NULL)
+            {
+                printf("ac_rm_algo:Cannot get ini file %s, section %s\n",
+                   configfilename, "params");
+                fflush(stdout);
+                return 0;
+            }
+
+	MAX_GREEN_UPPERBOUND = (int)get_ini_long( configfileptr, "MAX_GREEN_UPPERBOUND", 24L );
+	MAX_GREEN_LOWERBOUND = (int)get_ini_long( configfileptr, "MAX_GREEN_LOWERBOUND", 12L );
+	RAMP_LIMIT = (float)get_ini_double( configfileptr, "RAMP_LIMIT", 76.0L );
+	LT_OCC_THRESHOLD = (float)get_ini_double( configfileptr, "LT_OCC_THRESHOLD", 0.15 );
+	MAX_GREEN_CHANGE = (int)get_ini_long( configfileptr, "MAX_GREEN_CHANGE", 2L );
+	RT_RELEASE_OCC_THRESHOLD = (float)get_ini_double( configfileptr, "RT_RELEASE_OCC_THRESHOLD", 0.35 );
+	MAX_STEPS = (int)get_ini_long( configfileptr, "MAX_STEPS", 100L );
+	THRESHOLD_OCC_HEALTH = (float)get_ini_double( configfileptr, "THRESHOLD_OCC_HEALTH", 0.05 );
+	THRESHOLD_VOL_HEALTH = (float)get_ini_double( configfileptr, "THRESHOLD_VOL_HEALTH", 0.1 );
+	CYCLE_TO_ACTIVATE_OVERWRITE = (int)get_ini_long( configfileptr, "CYCLE_TO_ACTIVATE_OVERWRITE", 3L );
+	CYCLE_TO_RELEASE = (int)get_ini_long( configfileptr, "CYCLE_TO_RELEASE", 3L );
+	REGULAR_CYCLE = (int)get_ini_long( configfileptr, "REGULAR_CYCLE", 1L );
+	OVERWRITE_CYCLE = (int)get_ini_long( configfileptr, "OVERWRITE_CYCLE", 1L );
+	QUEUE_OCC_THRESHOLD_TO_ACTIVATE_INTERSECTION = (int)get_ini_long( configfileptr, "QUEUE_OCC_THRESHOLD_TO_ACTIVATE_INTERSECTION", 30L );
+	LEFT_OCC_THRESHOLD_TO_ACTIVATE_INTERSECTION = (float)get_ini_double( configfileptr, "LEFT_OCC_THRESHOLD_TO_ACTIVATE_INTERSECTION", 0.3 );
+	RIGHT_OCC_THRESHOLD_TO_ACTIVATE_INTERSECTION = (float)get_ini_double( configfileptr, "RIGHT_OCC_THRESHOLD_TO_ACTIVATE_INTERSECTION", 0.3 );
+	METHOD_FOR_RAMP_QUEUE = (int)get_ini_long( configfileptr, "METHOD_FOR_RAMP_QUEUE", 3L );
+	SHOCH_WAVE_SPEED = (float)get_ini_double( configfileptr, "SHOCH_WAVE_SPEED", -15.0 );
+	VEHICLE_EFFECTIVE_LENGTH = (float)get_ini_double( configfileptr, "VEHICLE_EFFECTIVE_LENGTH", 0.006 );
+	ALINEA_GAMMA = (float)get_ini_double( configfileptr, "ALINEA_GAMMA", 0.2 );
+	ALPHA = (float)get_ini_double( configfileptr, "ALPHA", 1.0 );
+	ALINEA_LOWER_BOUND = (float)get_ini_double( configfileptr, "ALINEA_LOWER_BOUND", 600.0 );
+	ALINEA_UPPER_BOUND = (float)get_ini_double( configfileptr, "ALINEA_UPPER_BOUND", 900.0 );
+	QUEUE_RESET = get_ini_bool( configfileptr, "QUEUE_RESET", FALSE);
+	QUEUE_RESET_INTERVAL = (int)get_ini_long( configfileptr, "QUEUE_RESET_INTERVAL", 300L );
+	RAMP_EXIT_FLOW_ADJUST_FACTOR = (float)get_ini_double( configfileptr, "RAMP_EXIT_FLOW_ADJUST_FACTOR", 0.92 );
+	RAMP_METER_CHANGE_THRESHOLD = (float)get_ini_double( configfileptr, "RAMP_METER_CHANGE_THRESHOLD", 0.1 );
+	OCC_CRITICAL = (float)get_ini_double( configfileptr, "OCC_CRITICAL", 10.0 );
+	IN_LANES = (float)get_ini_double( configfileptr, "IN_LANES", 2.0 );
+	OUT_LANES = (float)get_ini_double( configfileptr, "OUT_LANES", 2.0 );
+	ALINEA_KR = (float)get_ini_double( configfileptr, "ALINEA_KR", 70.0 );
+
+	fclose(configfileptr);
+
+#endif
         init_signal(&signal_data);
         init_realtimedata(&signal_data);
         init_ramp_data(&ramp_data);
