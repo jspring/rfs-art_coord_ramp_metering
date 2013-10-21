@@ -36,7 +36,7 @@ typedef unsigned int bool;
 
 //ramp parameters
 #define SHOCH_WAVE_SPEED -15.0
-#define VEHICLE_EFFECTIVE_LENGTH 0.006
+#define VEHICLE_EFFECTIVE_LENGTH 0.01
 #define ALINEA_GAMMA 0.2
 #define ALPHA 1.0
 #define ALINEA_LOWER_BOUND 600.0
@@ -47,10 +47,10 @@ typedef unsigned int bool;
 #define RAMP_METER_CHANGE_THRESHOLD 0.1
 
 //ramp parameters, ALINEA algorithm
-#define OCC_CRITICAL 25.0
+#define OCC_CRITICAL 8.0
 #define IN_LANES 2.0
-#define OUT_LANES 3.0
-#define ALINEA_KR 70.0
+#define OUT_LANES 2.0
+#define ALINEA_KR 40.0
 
 #else
 
