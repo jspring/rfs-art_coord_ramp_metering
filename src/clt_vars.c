@@ -35,6 +35,10 @@ int main(int argc, char *argv[])
 	char *domain = DEFAULT_SERVICE; // usually no need to change this 
 	int xport = COMM_OS_XPORT;	// set correct for OS in sys_os.h 
 	int verbose = 0;
+	char zero_array[200];
+	int i;
+
+	memset(zero_array, 0, sizeof(zero_array));
 
 	/* Read and interpret any user switches. */
 	while ((option = getopt(argc, argv, "i:v")) != EOF) {
@@ -64,6 +68,12 @@ int main(int argc, char *argv[])
 			db_vars_list, num_db_vars, NULL, 0)) == NULL) {
 		printf("Database initialization error in %s.\n", argv[0]);
 		exit(EXIT_FAILURE);
+	}
+	for (i = 0; i < num_db_vars; i++){
+		db_clt_write(pclt,
+		db_vars_list[i].id,
+		db_vars_list[i].size,
+		zero_array);
 	}
         
 	/* Setup a timer for every 'interval' msec. */
