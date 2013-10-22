@@ -90,7 +90,7 @@ int main( int argc, char *argv[]) {
 	double timediff = 0;
 	float meter_rate_sav = 900.0;
 
-	int interval = 1000;
+	int interval = 50;
 	int verbose = 0;
 	int retval = 0;
 
@@ -104,10 +104,13 @@ int main( int argc, char *argv[]) {
 	int flag2;
 
         /* Read and interpret any user switches. */
-        while ((option = getopt(argc, argv, "vf:")) != EOF) {
+        while ((option = getopt(argc, argv, "vf:i:")) != EOF) {
                 switch(option) {
                 case 'v':
                         verbose = 1;
+                        break;
+                case 'i':
+                        interval = atoi(optarg);
                         break;
                 case 'f':
 #ifdef USE_CONFIG_FILE
@@ -126,7 +129,8 @@ int main( int argc, char *argv[]) {
 	get_local_name(hostname, MAXHOSTNAMELEN);
 	if ( ((pclt = db_list_init(argv[0], hostname,
 		domain, xport, NULL, 0, 
-		db_trig_list_algo, NUM_TRIG_VARS_ALGO)) == NULL))
+		NULL, 0)) == NULL))
+//		db_trig_list_algo, NUM_TRIG_VARS_ALGO)) == NULL))
 		exit(EXIT_FAILURE);
 	if (setjmp(exit_env) != 0) {
 		db_list_done(pclt, NULL, 0, NULL, 0);
@@ -262,7 +266,7 @@ int main( int argc, char *argv[]) {
 			}
 		}
 
-//		if( (ramp_flag != 0) || (signal_flag != 0) )
+		if( (ramp_flag != 0) || (signal_flag != 0) )
 
 		test(&db_signal_data, &db_ramp_data, signal_flag, ramp_flag);
 
@@ -283,9 +287,27 @@ int main( int argc, char *argv[]) {
 	}		
 
 	
-		if(ramp_flag != 0) {
+		if(db_urms_status.action[0] == URMS_ACTION_REST_IN_GREEN)
+			{
+				db_urms.lane_1_action = URMS_ACTION_SKIP;
+				db_urms.lane_1_release_rate = (db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char) db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb;
+				db_urms.lane_1_plan = db_urms_status.plan[0];
+				db_urms.lane_2_release_rate = ramp_data.new_meter_rate;
+				db_urms.lane_3_release_rate = ramp_data.new_meter_rate;
+				db_urms.lane_2_action = URMS_ACTION_REST_IN_GREEN;
+				db_urms.lane_3_action = URMS_ACTION_REST_IN_GREEN;
+				db_urms.lane_2_plan = 2;
+				db_urms.lane_3_plan = 1;
+				db_clt_write(pclt, DB_URMS_VAR, sizeof(db_urms_t), &db_urms);
+			}
+		
+		else {
+		    if(ramp_flag != 0) {
 //			if( ramp_data.new_meter_rate != meter_rate_sav) 
 			{
+				db_urms.lane_1_action = URMS_ACTION_SKIP;
+				db_urms.lane_1_release_rate = (db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char) db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb;
+				db_urms.lane_1_plan = db_urms_status.plan[0];
 				db_urms.lane_2_release_rate = ramp_data.new_meter_rate;
 				db_urms.lane_3_release_rate = ramp_data.new_meter_rate;
 				db_urms.lane_2_action = URMS_ACTION_FIXED_RATE;
@@ -296,7 +318,9 @@ int main( int argc, char *argv[]) {
 				printf("ac_rm_algo: new meter rate %f\n", ramp_data.new_meter_rate);
 				meter_rate_sav = ramp_data.new_meter_rate;
 			}
+		    }
 		}
+	TIMER_WAIT(ptmr);
 	}
 	fclose(meter_fp);
 	fclose(signal_fp);
@@ -316,10 +340,11 @@ int test(db_signal_data_t *db_signal_data, db_ramp_data_t *db_ramp_data, unsigne
 	if(flag==0)
 	{
 		//Must wait until known good data before checking flag and doing rate calculation
-//		if( ramp_flag == 1 )
-//		{
+		if( ramp_flag == 1 )
+		{
 			pramp_data->new_meter_rate = get_ALINEA_rate(pramp_data);
-//		}
+printf("get_ALINEA_rate: new meter rate %.1f\n", pramp_data->new_meter_rate);
+		}
 	}
 
 	db_ramp_data->mainline_lead_occ[0] = pramp_data->mainline_lead_occ[NUMBER_RAMP_DATA-1][0];
