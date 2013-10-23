@@ -17,7 +17,9 @@ if [[ $1 == "home" ]]
 then
 	/home/atsc/ab3418/lnx/ab3418comm -u -p /dev/ttyUSB0 >>/big/data/ac_rm_1/ab3418comm.out 2>>/big/data/ac_rm_1/ab3418comm.err &
 else
-	/home/atsc/ab3418/lnx/ab3418comm -u >>/big/data/ac_rm_1/ab3418comm.out 2 >>/big/data/ac_rm_1/ab3418comm.err &
+#	/home/atsc/ab3418/lnx/ab3418comm -u >>/big/data/ac_rm_1/ab3418comm.out 2 >>/big/data/ac_rm_1/ab3418comm.err &
+#	Start up no control
+	/home/atsc/ab3418/lnx/ab3418comm -n -u >>/big/data/ac_rm_1/ab3418comm.out 2 >>/big/data/ac_rm_1/ab3418comm.err &
 fi
 sleep 5
 

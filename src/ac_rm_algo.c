@@ -93,6 +93,7 @@ int main( int argc, char *argv[]) {
 	int interval = 50;
 	int verbose = 0;
 	int retval = 0;
+	int new_max_green = 25;
 
 	int option;
 
@@ -272,22 +273,23 @@ int main( int argc, char *argv[]) {
 
 	if(signal_flag !=0) {
 		db_clt_read(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
-//		new_max_green = signal_data.new_max_green;
+		new_max_green = signal_data.new_max_green;
 #define PHASE_3			3
 #define YELLOW_NO_CHANGE	0
 #define ALL_RED_NO_CHANGE	0
 #define MIN_GREEN_NO_CHANGE	0
-//		flag2 = db_set_min_max_green(pclt, PHASE_3, MIN_GREEN_NO_CHANGE, new_max_green, YELLOW_NO_CHANGE, ALL_RED_NO_CHANGE, verbose);
-//		if(flag2) {
-//			fprintf(stderr, "db_set_min_max_green failed. Exiting....\n");	
-//			return -1;
-//		}
-//		phase_timing.max_green1 = new_max_green;
-//		db_clt_write(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
+		flag2 = db_set_min_max_green(pclt, PHASE_3, MIN_GREEN_NO_CHANGE, new_max_green, YELLOW_NO_CHANGE, ALL_RED_NO_CHANGE, verbose);
+		if(flag2) {
+			fprintf(stderr, "db_set_min_max_green failed. Exiting....\n");	
+			return -1;
+		}
+		phase_timing.max_green1 = new_max_green;
+		db_clt_write(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
 	}		
 
 	
-		if(db_urms_status.action[0] == URMS_ACTION_REST_IN_GREEN && 
+		if( (db_urms_status.plan_base_lvl[0] == 0) || 
+		    (db_urms_status.action[0] == URMS_ACTION_REST_IN_GREEN) || 
 		   ( (db_urms.lane_2_action != URMS_ACTION_REST_IN_GREEN) || 
 		     (db_urms.lane_2_action != URMS_ACTION_REST_IN_GREEN) ) )
 			{
@@ -298,8 +300,8 @@ int main( int argc, char *argv[]) {
 				db_urms.lane_3_release_rate = ramp_data.new_meter_rate;
 				db_urms.lane_2_action = URMS_ACTION_REST_IN_GREEN;
 				db_urms.lane_3_action = URMS_ACTION_REST_IN_GREEN;
-				db_urms.lane_2_plan = 0;
-				db_urms.lane_3_plan = 0;
+				db_urms.lane_2_plan = db_urms_status.plan[1];
+				db_urms.lane_3_plan = db_urms_status.plan[2];
 				db_clt_write(pclt, DB_URMS_VAR, sizeof(db_urms_t), &db_urms);
 			}
 		
