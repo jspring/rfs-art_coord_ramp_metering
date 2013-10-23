@@ -287,7 +287,9 @@ int main( int argc, char *argv[]) {
 	}		
 
 	
-		if(db_urms_status.action[0] == URMS_ACTION_REST_IN_GREEN)
+		if(db_urms_status.action[0] == URMS_ACTION_REST_IN_GREEN && 
+		   ( (db_urms.lane_2_action != URMS_ACTION_REST_IN_GREEN) || 
+		     (db_urms.lane_2_action != URMS_ACTION_REST_IN_GREEN) ) )
 			{
 				db_urms.lane_1_action = URMS_ACTION_SKIP;
 				db_urms.lane_1_release_rate = (db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char) db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb;
@@ -296,8 +298,8 @@ int main( int argc, char *argv[]) {
 				db_urms.lane_3_release_rate = ramp_data.new_meter_rate;
 				db_urms.lane_2_action = URMS_ACTION_REST_IN_GREEN;
 				db_urms.lane_3_action = URMS_ACTION_REST_IN_GREEN;
-				db_urms.lane_2_plan = 2;
-				db_urms.lane_3_plan = 1;
+				db_urms.lane_2_plan = 0;
+				db_urms.lane_3_plan = 0;
 				db_clt_write(pclt, DB_URMS_VAR, sizeof(db_urms_t), &db_urms);
 			}
 		
