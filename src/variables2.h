@@ -37,7 +37,7 @@ typedef unsigned int bool;
 //ramp parameters
 #define SHOCH_WAVE_SPEED -15.0
 #define VEHICLE_EFFECTIVE_LENGTH 0.01
-#define ALINEA_GAMMA 0.2
+#define ALINEA_GAMMA 1.0
 #define ALPHA 1.0
 #define ALINEA_LOWER_BOUND 600.0
 #define ALINEA_UPPER_BOUND 900.0
@@ -45,6 +45,12 @@ typedef unsigned int bool;
 #define QUEUE_RESET_INTERVAL 5*60
 #define RAMP_EXIT_FLOW_ADJUST_FACTOR 0.92
 #define RAMP_METER_CHANGE_THRESHOLD 0.1
+#define PLANTIME1 (17.0f*3600.0f+15.0f*60.0f)
+#define PLANTIME2 (17.0f*3600.0f+45.0f*60.0f)
+#define METER_LOWER_BOUND1 720.0f
+#define METER_LOWER_BOUND2 660.0f
+#define METER_LOWER_BOUND3 600.0f
+
 
 //ramp parameters, ALINEA algorithm
 #define OCC_CRITICAL 8.0
@@ -84,6 +90,12 @@ extern int QUEUE_RESET;
 extern float QUEUE_RESET_INTERVAL;
 extern float RAMP_EXIT_FLOW_ADJUST_FACTOR;
 extern float RAMP_METER_CHANGE_THRESHOLD;
+extern float PLANTIME1;
+extern float PLANTIME2;
+extern float METER_LOWER_BOUND1;
+extern float METER_LOWER_BOUND2;
+extern float METER_LOWER_BOUND3;
+
 
 //ramp parameters, ALINEA algorithm;
 extern float OCC_CRITICAL;
