@@ -65,7 +65,6 @@ int main( int argc, char *argv[]) {
 	char *domain = DEFAULT_SERVICE;
 	int xport = COMM_OS_XPORT;
 	posix_timer_typ *ptmr;
-	trig_info_typ trig_info;
 
 	db_urms_t db_urms;
 	db_signal_data_t db_signal_data;
@@ -76,24 +75,16 @@ int main( int argc, char *argv[]) {
 	phase_status_t phase_status;
 
         int ipc_message_error_ctr = 0;
-	unsigned char greenstat = 0;
-	unsigned char greenstat_sav = 0;
 	phase_timing_t phase_timing;
-	struct timespec start_time;
-	struct timespec end_time;
-	struct timespec call_test;
-	struct timespec call_test_sav;
 	unsigned char ramp_flag = 0;
 	unsigned char ramp_flag_sav = 0;
 	unsigned char signal_flag = 0;
 	unsigned char signal_flag_sav = 0;
-	double timediff = 0;
-	float meter_rate_sav = 900.0;
 
 	int interval = 50;
 	int verbose = 0;
-	int retval = 0;
 	int new_max_green = 25;
+	char myflag = 0;
 
 	int option;
 
@@ -222,8 +213,11 @@ int main( int argc, char *argv[]) {
 		phase_timing.max_green1,
 		phase_timing.min_green + phase_timing.max_green1
 	);
-	clock_gettime(CLOCK_REALTIME, &call_test_sav);
-	
+		db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
+		if(db_urms_status.plan_base_lvl[0] == 0)
+			myflag = 0;
+		else
+			myflag = 1; 
 	while(1) {	
 //		clt_ipc_receive(pclt, &trig_info, sizeof(trig_info));
 
@@ -233,7 +227,7 @@ int main( int argc, char *argv[]) {
 		db_clt_read(pclt, DB_URMS_DATAFILE_VAR, sizeof(urms_datafile_t), &urms_datafile);
 		db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
 
-		retval = set_globals(&phase_status, &get_long_status8_resp_mess, &db_urms_status, &urms_datafile);
+		set_globals(&phase_status, &get_long_status8_resp_mess, &db_urms_status, &urms_datafile);
 
 		signal_flag = phase_status.barrier_flag;
 		if((signal_flag != 0) && (signal_flag_sav == 0)) {
@@ -287,12 +281,13 @@ int main( int argc, char *argv[]) {
 		db_clt_write(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
 	}		
 
-	
-		if( (db_urms_status.plan_base_lvl[0] == 0) || 
-		    (db_urms_status.action[0] == URMS_ACTION_REST_IN_GREEN) || 
-		   ( (db_urms.lane_2_action != URMS_ACTION_REST_IN_GREEN) || 
-		     (db_urms.lane_2_action != URMS_ACTION_REST_IN_GREEN) ) )
+	if( (db_urms_status.hour >= 13) && (db_urms_status.hour < 19)) { //check time
+//		If HOV lane has transitioned from 1->0, set lanes 2 & 3 to REST_IN_GREEN
+		if( (db_urms_status.plan_base_lvl[0] == 0) &&
+			(myflag == 0))
 			{
+				myflag = 1;
+				printf("Setting lanes 2 & 3 to REST_IN_GREEN\n");
 				db_urms.lane_1_action = URMS_ACTION_SKIP;
 				db_urms.lane_1_release_rate = (db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char) db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb;
 				db_urms.lane_1_plan = db_urms_status.plan[0];
@@ -300,30 +295,49 @@ int main( int argc, char *argv[]) {
 				db_urms.lane_3_release_rate = ramp_data.new_meter_rate;
 				db_urms.lane_2_action = URMS_ACTION_REST_IN_GREEN;
 				db_urms.lane_3_action = URMS_ACTION_REST_IN_GREEN;
+				db_urms.lane_2_action = 2;
+				db_urms.lane_3_action = 2;
 				db_urms.lane_2_plan = db_urms_status.plan[1];
 				db_urms.lane_3_plan = db_urms_status.plan[2];
 				db_clt_write(pclt, DB_URMS_VAR, sizeof(db_urms_t), &db_urms);
 			}
-		
 		else {
-		    if(ramp_flag != 0) {
-//			if( ramp_data.new_meter_rate != meter_rate_sav) 
-			{
-				db_urms.lane_1_action = URMS_ACTION_SKIP;
-				db_urms.lane_1_release_rate = (db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char) db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb;
-				db_urms.lane_1_plan = db_urms_status.plan[0];
-				db_urms.lane_2_release_rate = ramp_data.new_meter_rate;
-				db_urms.lane_3_release_rate = ramp_data.new_meter_rate;
-				db_urms.lane_2_action = URMS_ACTION_FIXED_RATE;
-				db_urms.lane_3_action = URMS_ACTION_FIXED_RATE;
-				db_urms.lane_2_plan = 2;
-				db_urms.lane_3_plan = 1;
-				db_clt_write(pclt, DB_URMS_VAR, sizeof(db_urms_t), &db_urms);
-				printf("ac_rm_algo: new meter rate %f\n", ramp_data.new_meter_rate);
-				meter_rate_sav = ramp_data.new_meter_rate;
+//		If HOV lane has transitioned from 1->1, but lanes 2 & 3 were REST_IN_GREEN 
+//		(because of a previous HOV transition 1->0), skip the next block, which would
+//		set a fixed rate.
+			if( ((db_urms_status.plan_base_lvl[0] == 1) || (db_urms_status.plan_base_lvl[0] == 0)) &&
+				(myflag == 1)) {
+//				printf("HOV level %d\n", db_urms_status.plan_base_lvl[0]);
+			; //Do nothing; HOV has not yet transitioned from level 1 to level 2
 			}
-		    }
+		
+			else {
+			    if(ramp_flag != 0) {
+				{
+					myflag = 0;
+					db_urms.lane_1_action = URMS_ACTION_SKIP;
+					db_urms.lane_1_release_rate = (db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char) db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb;
+					db_urms.lane_1_plan = db_urms_status.plan[0];
+					db_urms.lane_2_plan = 2;
+					db_urms.lane_3_plan = 1;
+					if(urms_datafile.metering_rate[0] < ramp_data.new_meter_rate) {
+						db_urms.lane_2_release_rate = urms_datafile.metering_rate[0];
+						db_urms.lane_3_release_rate = urms_datafile.metering_rate[0];
+					}
+					else {
+						db_urms.lane_2_release_rate = ramp_data.new_meter_rate;
+						db_urms.lane_3_release_rate = ramp_data.new_meter_rate;
+					}
+					db_urms.lane_2_action = URMS_ACTION_FIXED_RATE;
+					db_urms.lane_3_action = URMS_ACTION_FIXED_RATE;
+					db_clt_write(pclt, DB_URMS_VAR, sizeof(db_urms_t), &db_urms);
+					printf("ac_rm_algo: new meter rate %f\n", ramp_data.new_meter_rate);
+				}
+			    }
+			}
+//printf("myflag %d\n", myflag);
 		}
+	}
 	TIMER_WAIT(ptmr);
 	}
 	fclose(meter_fp);

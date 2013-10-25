@@ -164,6 +164,9 @@ data_log_column_spec_t file_spec[] =
 	{"%d ",   &db_signal_data.realtime_data[PHASE6SIGNAL], BASE_INT, REPLAY_USE}, 	//###97
 	{"%d ",   &db_signal_data.realtime_data[PHASE7SIGNAL], BASE_INT, REPLAY_USE}, 	//###98
 	{"%d ",   &db_signal_data.realtime_data[PHASE3SIGNAL], BASE_INT, REPLAY_USE}, 	//###99
+	{"%hhu ",   &db_urms_status.plan_base_lvl[0], BASE_CHAR, REPLAY_USE},		//###100
+	{"%hhu ",   &db_urms_status.plan_base_lvl[1], BASE_CHAR, REPLAY_USE},		//###101
+	{"%hhu ",   &db_urms_status.plan_base_lvl[2], BASE_CHAR, REPLAY_USE},		//###102
 };
 
 #define NUM_FILE_COLUMNS sizeof(file_spec)/sizeof(data_log_column_spec_t)
