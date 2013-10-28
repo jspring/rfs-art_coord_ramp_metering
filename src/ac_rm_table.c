@@ -167,6 +167,7 @@ data_log_column_spec_t file_spec[] =
 	{"%hhu ",   &db_urms_status.plan_base_lvl[0], BASE_CHAR, REPLAY_USE},		//###100
 	{"%hhu ",   &db_urms_status.plan_base_lvl[1], BASE_CHAR, REPLAY_USE},		//###101
 	{"%hhu ",   &db_urms_status.plan_base_lvl[2], BASE_CHAR, REPLAY_USE},		//###102
+	{"%hhu ",   &db_urms_status.hour, BASE_CHAR, REPLAY_USE},			//###103
 };
 
 #define NUM_FILE_COLUMNS sizeof(file_spec)/sizeof(data_log_column_spec_t)
