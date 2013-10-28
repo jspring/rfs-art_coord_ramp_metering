@@ -22,7 +22,9 @@ int get_current_max_green()
 int init_signal(struct signal_variables* psignal_data)
 {
 
-	psignal_data->new_max_green=get_current_max_green();
+//	psignal_data->new_max_green=get_current_max_green(); This call has been replaced by a previous 
+//	database call that gets the phase 3 max_green1 value
+
 	psignal_data->last_sent_max_green=psignal_data->new_max_green;
 	psignal_data->old_max_green = psignal_data->new_max_green;
 
