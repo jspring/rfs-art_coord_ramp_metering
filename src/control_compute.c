@@ -92,11 +92,11 @@ int check_realtime_data_health(int data[][MAXCOL],int max_row)
 	if(check_phase8_detector(data,max_row))
 		return 1;
 	if(check_phase5_detector(data,max_row))
-		return 1;
+		return 2;
 	if(check_phase8_signal(data,max_row))
-		return 1;
+		return 3;
 	if(check_phase5_signal(data,max_row))
-		return 1;
+		return 4;
 	return 0;
 }
 
@@ -107,6 +107,7 @@ float get_meter_rate(struct ramp_variables *pramp_data)
 int get_intersection_measurement(struct signal_variables* psignal_data,struct ramp_variables *pramp_data)
 {
 	int flag=check_realtime_data_health(psignal_data->realtime_data, psignal_data->data_row);
+printf("get_intersection_measurement: flag %d\n", flag);
 	if(flag!=0)
 		return 1;
 
