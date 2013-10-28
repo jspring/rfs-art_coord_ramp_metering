@@ -189,8 +189,24 @@ int main( int argc, char *argv[]) {
 	fclose(configfileptr);
 
 #endif
+
+	db_clt_read(pclt, DB_PHASE_3_TIMING_VAR, sizeof(phase_timing_t), &phase_timing);
+	printf("Phase 3 min green %d max green 1 %d maximum green %d\n",
+		phase_timing.min_green,
+		phase_timing.max_green1,
+		phase_timing.min_green + phase_timing.max_green1
+	);
+	signal_data.new_max_green = phase_timing.max_green1;
+	db_clt_read(pclt, DB_PHASE_7_TIMING_VAR, sizeof(phase_timing_t), &phase_timing);
+	printf("Phase 7 min green %d max green 1 %d maximum green %d\n",
+		phase_timing.min_green,
+		phase_timing.max_green1,
+		phase_timing.min_green + phase_timing.max_green1
+	);
+
         init_signal(&signal_data);
         init_realtimedata(&signal_data);
+printf("signal_data.new_max_green %d\n", signal_data.new_max_green);
         init_ramp_data(&ramp_data);
 	memset(&db_urms, 0, sizeof(db_urms_t));
 	memset(&get_long_status8_resp_mess, 0, sizeof(get_long_status8_resp_mess_typ));
@@ -200,19 +216,6 @@ int main( int argc, char *argv[]) {
 
 	meter_fp = fopen("meter_result.txt", "w");
 	signal_fp = fopen("signal_result.txt", "w");
-
-	db_clt_read(pclt, DB_PHASE_3_TIMING_VAR, sizeof(phase_timing_t), &phase_timing);
-	printf("Phase 3 min green %d max green 1 %d maximum green %d\n",
-		phase_timing.min_green,
-		phase_timing.max_green1,
-		phase_timing.min_green + phase_timing.max_green1
-	);
-	db_clt_read(pclt, DB_PHASE_7_TIMING_VAR, sizeof(phase_timing_t), &phase_timing);
-	printf("Phase 7 min green %d max green 1 %d maximum green %d\n",
-		phase_timing.min_green,
-		phase_timing.max_green1,
-		phase_timing.min_green + phase_timing.max_green1
-	);
 		db_clt_read(pclt, DB_URMS_STATUS_VAR, sizeof(db_urms_status_t), &db_urms_status);
 		if(db_urms_status.plan_base_lvl[0] == 0)
 			myflag = 0;
@@ -439,11 +442,14 @@ printf("get_ALINEA_rate: new meter rate %.1f\n", pramp_data->new_meter_rate);
 	//If at barrier, calculate new max green time
 	if(signal_flag == 1)
 	{
+printf("1:signal_data.new_max_green %d\n", psignal_data->new_max_green);
 		//get new max green
 		flag=get_intersection_measurement(psignal_data,pramp_data);
 		if(flag==0)
 		{
+printf("flag=0\n");
 			flag=get_new_max_green_phase3(psignal_data,pramp_data);
+printf("2:signal_data.new_max_green %d\n", psignal_data->new_max_green);
 			fprintf(signal_fp,"%f\t%f\t%f\t%f\t%f\t%d\t%d\n",get_current_time(),psignal_data->LT_occ,psignal_data->RT_occ,pramp_data->queue_occ[NUMBER_RAMP_DATA-1][1],psignal_data->ramp_queue,psignal_data->new_max_green,(int)count);
 			fflush(NULL);
 			if (psignal_data->new_max_green!=psignal_data->last_sent_max_green)
