@@ -264,7 +264,7 @@ printf("signal_data.new_max_green %d\n", signal_data.new_max_green);
 			}
 		}
 
-		if( (ramp_flag != 0) || (signal_flag != 0) )
+//		if( (ramp_flag != 0) || (signal_flag != 0) )
 
 		test(&db_signal_data, &db_ramp_data, signal_flag, ramp_flag);
 
@@ -493,7 +493,7 @@ printf("2:signal_data.new_max_green %d\n", psignal_data->new_max_green);
 	db_signal_data->realtime_data[PHASE6SIGNAL] = signal_data.realtime_data[signal_data.data_row][PHASE6SIGNAL];
 	db_signal_data->realtime_data[PHASE7SIGNAL] = signal_data.realtime_data[signal_data.data_row][PHASE7SIGNAL];
 	db_signal_data->realtime_data[PHASE3SIGNAL] = signal_data.realtime_data[signal_data.data_row][PHASE3SIGNAL];
-	db_clt_write(pclt, DB_SIGNAL_DATA_VAR, sizeof(db_signal_data_t), &db_signal_data);
+	db_clt_write(pclt, DB_SIGNAL_DATA_VAR, sizeof(db_signal_data_t), db_signal_data);
 	return 0;
 }
 
