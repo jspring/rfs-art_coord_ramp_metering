@@ -271,11 +271,9 @@ printf("signal_data.new_max_green %d\n", signal_data.new_max_green);
 	if(signal_flag !=0) {
 		db_clt_read(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
 		new_max_green = signal_data.new_max_green;
-#define PHASE_3			3
-#define YELLOW_NO_CHANGE	0
-#define ALL_RED_NO_CHANGE	0
-#define MIN_GREEN_NO_CHANGE	0
-		flag2 = db_set_min_max_green(pclt, PHASE_3, MIN_GREEN_NO_CHANGE, new_max_green, YELLOW_NO_CHANGE, ALL_RED_NO_CHANGE, verbose);
+
+		printf("ac_rm_algo:db_set_phase3_max_green1 call new_max_green %d\n", new_max_green);
+		flag2 = db_set_phase3_max_green1(pclt, new_max_green, verbose);
 		if(flag2) {
 			fprintf(stderr, "db_set_min_max_green failed. Exiting....\n");	
 			return -1;
@@ -283,8 +281,7 @@ printf("signal_data.new_max_green %d\n", signal_data.new_max_green);
 		phase_timing.max_green1 = new_max_green;
 		db_clt_write(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
 	}		
-
-	if( (db_urms_status.hour >= 13) && (db_urms_status.hour < 19)) { //check time
+	if( (db_urms_status.hour >= 15) && (db_urms_status.hour < 19)) { //check time
 //		If HOV lane has transitioned from 1->0, set lanes 2 & 3 to REST_IN_GREEN
 		if( (db_urms_status.plan_base_lvl[0] == 0) &&
 			(myflag == 0))
@@ -507,14 +504,14 @@ int set_globals(phase_status_t *phase_status, get_long_status8_resp_mess_typ *st
 	sec =  phase_status->ts.sec;
 	min =  phase_status->ts.min;
   
-	greens = phase_status->greens;
-	yellows = phase_status->yellows;
-	reds = phase_status->reds;
-	green_yellow_overlap = status->green_yellow_overlap;
-	presence1 = status->presence1;
-	presence2 = status->presence2;
-	presence3 = status->presence3;
-	presence4 = status->presence4;
+	greens = (int)(0xFF & phase_status->greens);
+	yellows = (int)(0xFF & phase_status->yellows);
+	reds = (int)(0xFF & phase_status->reds);
+	green_yellow_overlap = (int)(0xFF & status->green_yellow_overlap);
+	presence1 = (int)(0xFF & status->presence1);
+	presence2 = (int)(0xFF & status->presence2);
+	presence3 = (int)(0xFF & status->presence3);
+	presence4 = (int)(0xFF & status->presence4);
 	
 //	printf("set_globals: greens %#hhx yellows %#hhx reds %#hhx\n", greens, yellows, reds);
 //	printf("set_globals: green_yellow_overlap %#hhx presence1 %#hhx presence2 %#hhx presence3 %#hhx presence4 %#hhx\n", green_yellow_overlap, presence1, presence2, presence3, presence4);
@@ -522,44 +519,44 @@ int set_globals(phase_status_t *phase_status, get_long_status8_resp_mess_typ *st
 //      fflush(NULL);
 
 
-	lead_stat_0 = db_urms_status->mainline_stat[0].lead_stat;
-	lead_vol_0 = db_urms_status->mainline_stat[0].lead_vol;
+	lead_stat_0 = (int)(0xFF & db_urms_status->mainline_stat[0].lead_stat);
+	lead_vol_0 = (int)(0xFF & db_urms_status->mainline_stat[0].lead_vol);
 	lead_occ_0 = urms_datafile->mainline_lead_occ[0];
-	trail_stat_0 = db_urms_status->mainline_stat[0].trail_stat;
-	trail_vol_0 = db_urms_status->mainline_stat[0].trail_vol;
+	trail_stat_0 = (int)(0xFF & db_urms_status->mainline_stat[0].trail_stat);
+	trail_vol_0 = (int)(0xFF & db_urms_status->mainline_stat[0].trail_vol);
 	trail_occ_0 = urms_datafile->mainline_trail_occ[0];
 	
-	lead_stat_1 = db_urms_status->mainline_stat[1].lead_stat;
-	lead_vol_1 = db_urms_status->mainline_stat[1].lead_vol;
+	lead_stat_1 = (int)(0xFF & db_urms_status->mainline_stat[1].lead_stat);
+	lead_vol_1 = (int)(0xFF & db_urms_status->mainline_stat[1].lead_vol);
 	lead_occ_1 = urms_datafile->mainline_lead_occ[1];
-	trail_stat_1 = db_urms_status->mainline_stat[1].trail_stat;
-	trail_vol_1 = db_urms_status->mainline_stat[1].trail_vol;
+	trail_stat_1 = (int)(0xFF & db_urms_status->mainline_stat[1].trail_stat);
+	trail_vol_1 = (int)(0xFF & db_urms_status->mainline_stat[1].trail_vol);
 	trail_occ_1 = urms_datafile->mainline_trail_occ[1];
 	
-	lead_stat_2 = db_urms_status->mainline_stat[2].lead_stat;
-	lead_vol_2 = db_urms_status->mainline_stat[2].lead_vol;
+	lead_stat_2 = (int)(0xFF & db_urms_status->mainline_stat[2].lead_stat);
+	lead_vol_2 = (int)(0xFF & db_urms_status->mainline_stat[2].lead_vol);
 	lead_occ_2 = urms_datafile->mainline_lead_occ[2];
-	trail_stat_2 = db_urms_status->mainline_stat[2].trail_stat;
-	trail_vol_2 = db_urms_status->mainline_stat[2].trail_vol;
+	trail_stat_2 = (int)(0xFF & db_urms_status->mainline_stat[2].trail_stat);
+	trail_vol_2 = (int)(0xFF & db_urms_status->mainline_stat[2].trail_vol);
 	trail_occ_2 = urms_datafile->mainline_trail_occ[2];
 
-	demand_vol_0 = db_urms_status->metered_lane_stat[0].demand_vol;
-	passage_vol_0 = db_urms_status->metered_lane_stat[0].passage_vol;
+	demand_vol_0 = (int)(0xFF & db_urms_status->metered_lane_stat[0].demand_vol);
+	passage_vol_0 = (int)(0xFF & db_urms_status->metered_lane_stat[0].passage_vol);
 	queue_occ_0 = urms_datafile->queue_occ[0];
-	queue_vol_0 = db_urms_status->queue_stat[0].vol;
-	rate_0 = urms_datafile->metering_rate[0];
+	queue_vol_0 = (int)(0xFF & db_urms_status->queue_stat[0].vol);
+	rate_0 = (int)(0xFF & urms_datafile->metering_rate[0]);
 
-	demand_vol_1 = db_urms_status->metered_lane_stat[1].demand_vol;
-	passage_vol_1 = db_urms_status->metered_lane_stat[1].passage_vol;
+	demand_vol_1 = (int)(0xFF & db_urms_status->metered_lane_stat[1].demand_vol);
+	passage_vol_1 = (int)(0xFF & db_urms_status->metered_lane_stat[1].passage_vol);
 	queue_occ_1 = urms_datafile->queue_occ[1];
-	queue_vol_1 = db_urms_status->queue_stat[1].vol;
-	rate_1 = urms_datafile->metering_rate[1];
+	queue_vol_1 = (int)(0xFF & db_urms_status->queue_stat[1].vol);
+	rate_1 = (int)(0xFF & urms_datafile->metering_rate[1]);
 
-	demand_vol_2 = db_urms_status->metered_lane_stat[2].demand_vol;
-	passage_vol_2 = db_urms_status->metered_lane_stat[2].passage_vol;
+	demand_vol_2 = (int)(0xFF & db_urms_status->metered_lane_stat[2].demand_vol);
+	passage_vol_2 = (int)(0xFF & db_urms_status->metered_lane_stat[2].passage_vol);
 	queue_occ_2 = urms_datafile->queue_occ[2];
-	queue_vol_2 = db_urms_status->queue_stat[2].vol;
-	rate_2 = urms_datafile->metering_rate[2];
+	queue_vol_2 = (int)(0xFF & db_urms_status->queue_stat[2].vol);
+	rate_2 = (int)(0xFF & urms_datafile->metering_rate[2]);
 
 	return 0;
 
