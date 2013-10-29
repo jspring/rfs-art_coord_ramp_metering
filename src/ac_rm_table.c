@@ -154,16 +154,16 @@ data_log_column_spec_t file_spec[] =
 	{"%.1f ",   &db_ramp_data.prev_update_data, BASE_FLOAT, REPLAY_USE}, 	//###87
 	{"%.3f ",   &db_ramp_data.prev_occ_out, BASE_FLOAT, REPLAY_USE}, 	//###88
 	{"%hhu ",   &db_ramp_data.passage_vol[2], BASE_CHAR, REPLAY_USE}, 	//###89
-	{"%d ",   &db_signal_data.realtime_data[PHASE5SIGNAL], BASE_INT, REPLAY_USE}, 	//###90
-	{"%d ",   &db_signal_data.realtime_data[PHASE5APPROACH1], BASE_INT, REPLAY_USE}, //###91
-	{"%d ",   &db_signal_data.realtime_data[PHASE5APPROACH2], BASE_INT, REPLAY_USE}, //###92
-	{"%d ",   &db_signal_data.realtime_data[PHASE5STOPBAR], BASE_INT, REPLAY_USE}, 	//###93
-	{"%d ",   &db_signal_data.realtime_data[PHASE8SIGNAL], BASE_INT, REPLAY_USE}, 	//###94
-	{"%d ",   &db_signal_data.realtime_data[PHASE8APPROACH], BASE_INT, REPLAY_USE}, //###95
-	{"%d ",   &db_signal_data.realtime_data[PHASE8STOPBAR], BASE_INT, REPLAY_USE}, 	//###96
-	{"%d ",   &db_signal_data.realtime_data[PHASE6SIGNAL], BASE_INT, REPLAY_USE}, 	//###97
-	{"%d ",   &db_signal_data.realtime_data[PHASE7SIGNAL], BASE_INT, REPLAY_USE}, 	//###98
-	{"%d ",   &db_signal_data.realtime_data[PHASE3SIGNAL], BASE_INT, REPLAY_USE}, 	//###99
+	{"%hhx ",   &db_signal_data.realtime_data[PHASE5SIGNAL], BASE_CHAR, REPLAY_USE}, 	//###90
+	{"%hhx ",   &db_signal_data.realtime_data[PHASE5APPROACH1], BASE_CHAR, REPLAY_USE}, //###91
+	{"%hhx ",   &db_signal_data.realtime_data[PHASE5APPROACH2], BASE_CHAR, REPLAY_USE}, //###92
+	{"%hhx ",   &db_signal_data.realtime_data[PHASE5STOPBAR], BASE_CHAR, REPLAY_USE}, 	//###93
+	{"%hhx ",   &db_signal_data.realtime_data[PHASE8SIGNAL], BASE_CHAR, REPLAY_USE}, 	//###94
+	{"%hhx ",   &db_signal_data.realtime_data[PHASE8APPROACH], BASE_CHAR, REPLAY_USE}, //###95
+	{"%hhx ",   &db_signal_data.realtime_data[PHASE8STOPBAR], BASE_CHAR, REPLAY_USE}, 	//###96
+	{"%hhx ",   &db_signal_data.realtime_data[PHASE6SIGNAL], BASE_CHAR, REPLAY_USE}, 	//###97
+	{"%hhx ",   &db_signal_data.realtime_data[PHASE7SIGNAL], BASE_CHAR, REPLAY_USE}, 	//###98
+	{"%hhx ",   &db_signal_data.realtime_data[PHASE3SIGNAL], BASE_CHAR, REPLAY_USE}, 	//###99
 	{"%hhu ",   &db_urms_status.plan_base_lvl[0], BASE_CHAR, REPLAY_USE},		//###100
 	{"%hhu ",   &db_urms_status.plan_base_lvl[1], BASE_CHAR, REPLAY_USE},		//###101
 	{"%hhu ",   &db_urms_status.plan_base_lvl[2], BASE_CHAR, REPLAY_USE},		//###102
