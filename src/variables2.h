@@ -16,8 +16,8 @@ typedef unsigned int bool;
 #ifndef USE_CONFIG_FILE 
 
 //intersection parameters
-#define MAX_GREEN_UPPERBOUND 24 
-#define MAX_GREEN_LOWERBOUND 12 
+#define MAX_GREEN_UPPERBOUND 30
+#define MAX_GREEN_LOWERBOUND 15
 #define RAMP_LIMIT 76.0 
 #define LT_OCC_THRESHOLD 0.15 
 #define MAX_GREEN_CHANGE 2 
