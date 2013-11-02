@@ -73,6 +73,7 @@ int main( int argc, char *argv[]) {
 	get_short_status_resp_t short_status;
 	urms_datafile_t urms_datafile;
 	phase_status_t phase_status;
+	timestamp_t ts;
 
         int ipc_message_error_ctr = 0;
 	phase_timing_t phase_timing;
@@ -287,7 +288,9 @@ printf("signal_data.new_max_green %d\n", signal_data.new_max_green);
 			(myflag == 0))
 			{
 				myflag = 1;
-				printf("Setting lanes 2 & 3 to REST_IN_GREEN\n");
+				get_current_timestamp(&ts);
+				print_timestamp(stdout, &ts);
+				printf(": Setting lanes 2 & 3 to REST_IN_GREEN\n");
 				db_urms.lane_1_action = URMS_ACTION_SKIP;
 				db_urms.lane_1_release_rate = (db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char) db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb;
 				db_urms.lane_1_plan = db_urms_status.plan[0];
