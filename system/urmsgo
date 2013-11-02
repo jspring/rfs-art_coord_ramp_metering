@@ -18,14 +18,14 @@ then
 	/home/atsc/urms/lnx/urms -r 10.0.1.126 -i 100 -n &
 else
 	echo "Starting urms"
-	/home/atsc/urms/lnx/urms -r 10.0.1.126 -i 100 &
+	/home/atsc/urms/lnx/urms -r 10.0.1.126 -i 100 >>/big/data/ac_rm_1/urms.err &
 fi
 sleep 1
 
 if [[ $1 != "sj" ]]
 then
 	echo "Starting send_urms"
-	/home/art_coord_ramp_metering/system/send_urms_data_go.sh $1 >/big/data/ac_rm_1/send_urms_data.err &
+	/home/art_coord_ramp_metering/system/send_urms_data_go.sh $1 >>/big/data/ac_rm_1/send_urms_data.err &
 	sleep 1
 fi
 
@@ -33,7 +33,7 @@ if [[ $1 == "sj" ]]
 then
 	echo "Starting ac_rm_algo"
 	cd /home/art_coord_ramp_metering/src
-	./lnx/ac_rm_algo >/big/data/ac_rm_1/ac_rm_algo.err &
+	./lnx/ac_rm_algo >>/big/data/ac_rm_1/ac_rm_algo.err &
 	sleep 1
 fi
 
