@@ -73,7 +73,6 @@ int main( int argc, char *argv[]) {
 	get_short_status_resp_t short_status;
 	urms_datafile_t urms_datafile;
 	phase_status_t phase_status;
-	timestamp_t ts;
 
         int ipc_message_error_ctr = 0;
 	phase_timing_t phase_timing;
@@ -81,6 +80,10 @@ int main( int argc, char *argv[]) {
 	unsigned char ramp_flag_sav = 0;
 	unsigned char signal_flag = 0;
 	unsigned char signal_flag_sav = 0;
+	struct timespec tp;
+	struct tm *ltime;
+	unsigned char timeflag = 0;
+	int dow;
 
 	int interval = 50;
 	int verbose = 0;
@@ -282,15 +285,21 @@ printf("signal_data.new_max_green %d\n", signal_data.new_max_green);
 		phase_timing.max_green1 = new_max_green;
 		db_clt_write(pclt, DB_PHASE_3_TIMING_VAR , sizeof(phase_timing_t), &phase_timing);
 	}		
-	if( (db_urms_status.hour >= 15) && (db_urms_status.hour < 19)) { //check time
-//		If HOV lane has transitioned from 1->0, set lanes 2 & 3 to REST_IN_GREEN
+	clock_gettime(CLOCK_REALTIME, &tp);
+	ltime = localtime(&tp.tv_sec);
+	dow = ltime->tm_wday;
+//	printf("dow=%d dow%%6=%d hour %d\n", dow, dow % 6, db_urms_status.hour);
+	if( ((dow % 6) != 0) && (db_urms_status.hour >= 15) && (db_urms_status.hour < 19)) { //check time
+		if(timeflag == 0) {
+			timeflag = 1;
+			printf("Enabling control: %s", ctime(&tp.tv_sec));
+		}
+		//If HOV lane has transitioned from 1->0, set lanes 2 & 3 to REST_IN_GREEN
 		if( (db_urms_status.plan_base_lvl[0] == 0) &&
 			(myflag == 0))
 			{
 				myflag = 1;
-				get_current_timestamp(&ts);
-				print_timestamp(stdout, &ts);
-				printf(": Setting lanes 2 & 3 to REST_IN_GREEN\n");
+				printf("%s : Setting lanes 2 & 3 to REST_IN_GREEN\n", ctime(&tp.tv_sec));
 				db_urms.lane_1_action = URMS_ACTION_SKIP;
 				db_urms.lane_1_release_rate = (db_urms_status.metered_lane_stat[0].metered_lane_rate_msb << 8) + (unsigned char) db_urms_status.metered_lane_stat[0].metered_lane_rate_lsb;
 				db_urms.lane_1_plan = db_urms_status.plan[0];
@@ -340,6 +349,13 @@ printf("signal_data.new_max_green %d\n", signal_data.new_max_green);
 			}
 //printf("myflag %d\n", myflag);
 		}
+	}
+	else {
+		if(timeflag == 1) {
+			timeflag = 0;
+			printf("Disabling control: %s", ctime(&tp.tv_sec));
+		}
+
 	}
 	TIMER_WAIT(ptmr);
 	}
