@@ -1,20 +1,24 @@
 #!/bin/bash
-#
-# Looks at the number of different values from the message counter
-# from the ramp meter computer. The latter sends a message to the
-# arterial computer whenever it polls the ramp meter. It increments
-# its message counter every time, so this counter should be constantly
-# incrementing until it rolls over at 255. If it stops, then there are
-# no messages being received from the ramp meter computer, and we should
-# restart the data collection (since there's no way to gracefully reset
-# the tcp connection on a listener).
+# From a data file, compares the number of different sequence numbers in the
+# rm2ac_ctr counter to the number of lines in the file. If the loop
+# interval of urms.c is the same as that of wrfiles_ac_rm, there should
+# be a 1-to-1 correspondence in the sequence number and a line of data. If
+# the file writing is twice the speed as the sending of messages from the controller (the 
+# current setting), we should see a 50% maximum.  Right now, it's hovering around 47%,
+# so we'll give it a 7% margin
 
 FILE=$1
-THRESHOLD_PCT=20
+THRESHOLD_PCT=40
 
-NUM_SEQ_NUM=`tail -200 $FILE | awk '{print $61}' | uniq -c | wc -l`
-
-if [[ $NUM_SEQ_NUM -lt 9 ]]
+NUM_SEQ_NUM=`cat $FILE | awk '{print $61}' | uniq -c | wc -l`
+NUMLINES=`wc -l $FILE | awk '{print $1}'`
+if [[ $NUMLINES -eq 0 ]]
+then
+	NUMLINES=1
+fi
+PCT=$(($NUM_SEQ_NUM*100/$NUMLINES))
+echo $FILE $NUMLINES $NUM_SEQ_NUM $PCT
+if [[ $PCT -lt $THRESHOLD_PCT ]]
 then
 	exit 1
 fi
